@@ -10,6 +10,7 @@ import {
   Settings,
   WandSparkles,
   CheckSquare,
+  Package,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import {
@@ -26,11 +27,15 @@ import { useUser } from '@/firebase';
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/history', icon: History, label: 'History' },
+  { href: '/features', icon: Package, label: 'Features' },
+];
+
+const featureItems = [
   { href: '/outline', icon: FileText, label: 'New Outline' },
   { href: '/draft', icon: PenSquare, label: 'New Draft' },
   { href: '/grammar-check', icon: CheckSquare, label: 'Grammar Check' },
   { href: '/improve-style', icon: WandSparkles, label: 'Improve Style' },
-];
+]
 
 export default function MainNav() {
   const pathname = usePathname();
@@ -60,6 +65,20 @@ export default function MainNav() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+        </SidebarMenu>
+        <SidebarMenu>
+            {featureItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    icon={<item.icon />}
+                    tooltip={item.label}
+                >
+                    <Link href={item.href}>{item.label}</Link>
+                </SidebarMenuButton>
+                </SidebarMenuItem>
+            ))}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
