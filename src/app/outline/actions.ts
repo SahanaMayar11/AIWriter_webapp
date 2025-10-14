@@ -20,7 +20,7 @@ export async function generateOutlineAction(
   const validatedFields = outlineFormSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
-  
+
   const fields = Object.fromEntries(formData.entries());
 
   if (!validatedFields.success) {

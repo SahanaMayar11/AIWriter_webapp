@@ -29,7 +29,7 @@ import { FileText, Terminal, PenSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser, useAppState } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export type FormState = {
@@ -44,16 +44,28 @@ const initialState: FormState = {
 };
 
 export function OutlineForm() {
-  const [state, formAction] = useActionState(generateOutlineAction, initialState);
+  const [state, formAction] = useActionState(
+    generateOutlineAction,
+    initialState
+  );
   const { toast } = useToast();
   const { user } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
+  const { language: appLanguage } = useAppState();
 
   const [topic, setTopic] = useState(state.fields?.topic || '');
   const [tone, setTone] = useState(state.fields?.tone || 'academic');
-  const [wordLimit, setWordLimit] = useState(state.fields?.wordLimit || '2000');
-  const [language, setLanguage] = useState(state.fields?.language || 'english');
+  const [wordLimit, setWordLimit] = useState(
+    state.fields?.wordLimit || '2000'
+  );
+  const [language, setLanguage] = useState(
+    state.fields?.language || appLanguage
+  );
+
+  useEffect(() => {
+    setLanguage(appLanguage);
+  }, [appLanguage]);
 
   useEffect(() => {
     if (state.message && state.message !== 'success') {
@@ -72,11 +84,11 @@ export function OutlineForm() {
         setTopic(state.fields.topic || '');
         setTone(state.fields.tone || 'academic');
         setWordLimit(state.fields.wordLimit || '2000');
-        setLanguage(state.fields.language || 'english');
+        setLanguage(state.fields.language || appLanguage);
       }
     }
-  }, [state, toast]);
-  
+  }, [state, toast, appLanguage]);
+
   const handleSave = async () => {
     if (!state.outline || !state.fields) {
       toast({
@@ -86,36 +98,41 @@ export function OutlineForm() {
       });
       return;
     }
-     if (!user || !firestore) {
-        toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'You must be logged in to save.',
-          });
-        return;
+    if (!user || !firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'You must be logged in to save.',
+      });
+      return;
     }
 
     try {
-        const historyRef = collection(firestore, 'users', user.uid, 'draftHistories');
-        await addDoc(historyRef, {
-            topic: state.fields.topic || '',
-            content: state.outline,
-            language: state.fields.language || 'english',
-            type: 'Outline',
-            userId: user.uid,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-        });
-        toast({
-            title: 'Saved!',
-            description: 'Your outline has been saved to your history.',
-          });
+      const historyRef = collection(
+        firestore,
+        'users',
+        user.uid,
+        'draftHistories'
+      );
+      await addDoc(historyRef, {
+        topic: state.fields.topic || '',
+        content: state.outline,
+        language: state.fields.language || appLanguage,
+        type: 'Outline',
+        userId: user.uid,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      toast({
+        title: 'Saved!',
+        description: 'Your outline has been saved to your history.',
+      });
     } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: 'Error saving outline',
-            description: error instanceof Error ? error.message : String(error),
-        });
+      toast({
+        variant: 'destructive',
+        title: 'Error saving outline',
+        description: error instanceof Error ? error.message : String(error),
+      });
     }
   };
 
@@ -139,7 +156,7 @@ export function OutlineForm() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-       <form action={formAction}>
+      <form action={formAction}>
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="font-headline">Outline Details</CardTitle>
@@ -203,7 +220,11 @@ export function OutlineForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="language">Language</Label>
-              <Select name="language" value={language} onValueChange={setLanguage}>
+              <Select
+                name="language"
+                value={language}
+                onValueChange={setLanguage}
+              >
                 <SelectTrigger id="language">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
@@ -239,23 +260,29 @@ export function OutlineForm() {
         <CardContent className="overflow-auto min-h-[450px]">
           <GenerationResult
             state={state}
-            render={(outline) => <div
-              className="prose prose-sm dark:prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: outline.replace(/\n/g, '<br />') }}
-            />}
-            initialIcon={<FileText className="h-16 w-16 text-muted-foreground/50" />}
+            render={(outline) => (
+              <div
+                className="prose prose-sm dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{
+                  __html: outline.replace(/\n/g, '<br />'),
+                }}
+              />
+            )}
+            initialIcon={
+              <FileText className="h-16 w-16 text-muted-foreground/50" />
+            }
             initialMessage="Your generated outline will appear here."
           />
         </CardContent>
-         {state.outline && (
-            <CardActions className="p-6 pt-0 space-x-2">
-              <Button onClick={handleSave}>Save Outline</Button>
-              <Button variant="secondary" onClick={handleGenerateDraft}>
-                <PenSquare className="mr-2 h-4 w-4" />
-                Generate Draft
-              </Button>
-            </CardActions>
-          )}
+        {state.outline && (
+          <CardActions className="p-6 pt-0 space-x-2">
+            <Button onClick={handleSave}>Save Outline</Button>
+            <Button variant="secondary" onClick={handleGenerateDraft}>
+              <PenSquare className="mr-2 h-4 w-4" />
+              Generate Draft
+            </Button>
+          </CardActions>
+        )}
       </Card>
     </div>
   );

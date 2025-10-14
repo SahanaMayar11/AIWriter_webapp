@@ -29,10 +29,16 @@ export const improveStyleFormSchema = z.object({
 });
 
 export const saveDraftHistorySchema = z.object({
-    topic: z.string(),
-    content: z.string(),
-    language: z.string(),
-    type: z.enum(['Draft', 'Outline', 'Grammar Check', 'Style Improvement', 'Playground'])
+  topic: z.string(),
+  content: z.string(),
+  language: z.string(),
+  type: z.enum([
+    'Draft',
+    'Outline',
+    'Grammar Check',
+    'Style Improvement',
+    'Playground',
+  ]),
 });
 
 export const playgroundFormSchema = z.discriminatedUnion('action', [
@@ -42,6 +48,7 @@ export const playgroundFormSchema = z.discriminatedUnion('action', [
     tone: z.string(),
     purpose: z.string(),
     content: z.string().optional(),
+    language: z.string(),
   }),
   z.object({
     action: z.literal('draft'),
@@ -49,6 +56,7 @@ export const playgroundFormSchema = z.discriminatedUnion('action', [
     tone: z.string(),
     purpose: z.string(),
     content: z.string().optional(),
+    language: z.string(),
   }),
   z.object({
     action: z.literal('grammar'),
@@ -56,6 +64,7 @@ export const playgroundFormSchema = z.discriminatedUnion('action', [
     topic: z.string().optional(),
     tone: z.string(),
     purpose: z.string(),
+    language: z.string(),
   }),
   z.object({
     action: z.literal('style'),
@@ -63,5 +72,6 @@ export const playgroundFormSchema = z.discriminatedUnion('action', [
     topic: z.string().optional(),
     tone: z.string(),
     purpose: z.string(),
+    language: z.string(),
   }),
 ]);

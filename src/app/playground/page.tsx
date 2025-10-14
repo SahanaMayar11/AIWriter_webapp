@@ -19,21 +19,25 @@ import {
   WandSparkles,
   Save,
   Download,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import { TONES, PURPOSES } from '@/lib/constants';
-import { useUser, useFirestore } from '@/firebase';
+import { useUser, useFirestore, useAppState } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 const initialState = {
   message: '',
   result: '',
+  fields: {},
+  action: '',
 };
 
 export default function PlaygroundPage() {
   const [state, formAction] = useActionState(playgroundAction, initialState);
   const [isPending, startTransition] = useTransition();
   const [pendingAction, setPendingAction] = useState<string | null>(null);
+
+  const { language } = useAppState();
 
   const [topic, setTopic] = useState('');
   const [tone, setTone] = useState('professional');
@@ -51,14 +55,18 @@ export default function PlaygroundPage() {
         title: 'Success!',
         description: 'Content has been generated.',
       });
-    } else if (state.message && state.message !== 'success' && state.message !== '') {
+    } else if (
+      state.message &&
+      state.message !== 'success' &&
+      state.message !== ''
+    ) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: state.message,
       });
     }
-    
+
     if (state.action) {
       setPendingAction(null);
     }
@@ -67,8 +75,9 @@ export default function PlaygroundPage() {
   const handleFormAction = (formData: FormData) => {
     const action = formData.get('action') as string;
     setPendingAction(action);
+    formData.set('language', language);
     startTransition(() => {
-        formAction(formData);
+      formAction(formData);
     });
   };
 
@@ -91,11 +100,16 @@ export default function PlaygroundPage() {
     }
 
     try {
-      const historyRef = collection(firestore, 'users', user.uid, 'draftHistories');
+      const historyRef = collection(
+        firestore,
+        'users',
+        user.uid,
+        'draftHistories'
+      );
       await addDoc(historyRef, {
         topic: topic || 'Untitled Playground Draft',
         content: content,
-        language: 'English',
+        language: language,
         type: 'Playground',
         userId: user.uid,
         createdAt: serverTimestamp(),
@@ -115,7 +129,7 @@ export default function PlaygroundPage() {
   };
 
   const handleExport = () => {
-     if (!content) {
+    if (!content) {
       toast({
         variant: 'destructive',
         title: 'Nothing to export',
@@ -133,18 +147,28 @@ export default function PlaygroundPage() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  
+
   const anyActionPending = isPending && pendingAction;
 
   return (
     <form action={handleFormAction} className="flex flex-col h-full gap-4">
       <div className="flex flex-wrap items-center gap-4 p-4 border rounded-lg bg-card">
         <div className="flex-1 min-w-[200px] space-y-1">
-          <label htmlFor="topic" className="text-sm font-medium">Topic</label>
-          <Input id="topic" name="topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Enter your topic..." />
+          <label htmlFor="topic" className="text-sm font-medium">
+            Topic
+          </label>
+          <Input
+            id="topic"
+            name="topic"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Enter your topic..."
+          />
         </div>
         <div className="space-y-1">
-           <label htmlFor="tone" className="text-sm font-medium">Tone</label>
+          <label htmlFor="tone" className="text-sm font-medium">
+            Tone
+          </label>
           <Select name="tone" value={tone} onValueChange={setTone}>
             <SelectTrigger id="tone" className="w-[180px]">
               <SelectValue placeholder="Select tone" />
@@ -159,7 +183,9 @@ export default function PlaygroundPage() {
           </Select>
         </div>
         <div className="space-y-1">
-           <label htmlFor="purpose" className="text-sm font-medium">Purpose</label>
+          <label htmlFor="purpose" className="text-sm font-medium">
+            Purpose
+          </label>
           <Select name="purpose" value={purpose} onValueChange={setPurpose}>
             <SelectTrigger id="purpose" className="w-[180px]">
               <SelectValue placeholder="Select purpose" />
@@ -174,33 +200,83 @@ export default function PlaygroundPage() {
           </Select>
         </div>
       </div>
-      
+
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" name="action" value="outline" variant="outline" disabled={anyActionPending}>
-          {pendingAction === 'outline' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
+        <Button
+          type="submit"
+          name="action"
+          value="outline"
+          variant="outline"
+          disabled={anyActionPending}
+        >
+          {pendingAction === 'outline' ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <FileText className="mr-2 h-4 w-4" />
+          )}
           Generate Outline
         </Button>
-        <Button type="submit" name="action" value="draft" variant="outline" disabled={anyActionPending}>
-          {pendingAction === 'draft' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PenSquare className="mr-2 h-4 w-4" />}
+        <Button
+          type="submit"
+          name="action"
+          value="draft"
+          variant="outline"
+          disabled={anyActionPending}
+        >
+          {pendingAction === 'draft' ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <PenSquare className="mr-2 h-4 w-4" />
+          )}
           Create Draft
         </Button>
-        <Button type="submit" name="action" value="grammar" variant="outline" disabled={anyActionPending}>
-          {pendingAction === 'grammar' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <SpellCheck className="mr-2 h-4 w-4" />}
+        <Button
+          type="submit"
+          name="action"
+          value="grammar"
+          variant="outline"
+          disabled={anyActionPending}
+        >
+          {pendingAction === 'grammar' ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <SpellCheck className="mr-2 h-4 w-4" />
+          )}
           Check Grammar
         </Button>
-        <Button type="submit" name="action" value="style" variant="outline" disabled={anyActionPending}>
-          {pendingAction === 'style' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <WandSparkles className="mr-2 h-4 w-4" />}
+        <Button
+          type="submit"
+          name="action"
+          value="style"
+          variant="outline"
+          disabled={anyActionPending}
+        >
+          {pendingAction === 'style' ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <WandSparkles className="mr-2 h-4 w-4" />
+          )}
           Improve Style
         </Button>
         <div className="ml-auto flex items-center gap-2">
-           <Button type="button" variant="outline" onClick={handleSave} disabled={anyActionPending}>
-              <Save className="mr-2 h-4 w-4" />
-              Save Draft
-            </Button>
-            <Button type="button" variant="outline" onClick={handleExport} disabled={anyActionPending}>
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSave}
+            disabled={anyActionPending}
+          >
+            <Save className="mr-2 h-4 w-4" />
+            Save Draft
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleExport}
+            disabled={anyActionPending}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
         </div>
       </div>
 
@@ -213,7 +289,7 @@ export default function PlaygroundPage() {
           className="flex-1 w-full h-full text-base resize-none"
         />
         <div className="text-sm text-muted-foreground p-2 text-right">
-            {content.split(/\s+/).filter(Boolean).length} words
+          {content.split(/\s+/).filter(Boolean).length} words
         </div>
       </div>
     </form>

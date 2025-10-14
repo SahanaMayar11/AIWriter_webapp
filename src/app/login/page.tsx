@@ -15,20 +15,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import { useAuth, useUser } from '@/firebase';
-import { signInWithEmailAndPassword, type Auth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  type Auth,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import type { FirebaseError } from 'firebase/app';
 
-function initiateEmailSignIn(
+async function initiateEmailSignIn(
   auth: Auth,
   email: string,
   password: string
 ): Promise<void> {
-  return signInWithEmailAndPassword(auth, email, password).then(() => {});
+  await signInWithEmailAndPassword(auth, email, password);
 }
 
-function initiateGoogleSignIn(auth: Auth): Promise<void> {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider).then(() => {});
+async function initiateGoogleSignIn(auth: Auth): Promise<void> {
+  const provider = new GoogleAuthProvider();
+  await signInWithPopup(auth, provider);
 }
 
 export default function LoginPage() {
@@ -49,8 +54,11 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     if (!auth) return;
-    initiateEmailSignIn(auth, email, password).catch((err: FirebaseError) => {
-      switch (err.code) {
+    try {
+      await initiateEmailSignIn(auth, email, password);
+    } catch (err) {
+      const error = err as FirebaseError;
+      switch (error.code) {
         case 'auth/wrong-password':
           setError('Incorrect password. Please try again.');
           break;
@@ -64,19 +72,26 @@ export default function LoginPage() {
           setError('An unknown error occurred. Please try again.');
           break;
       }
-    });
+    }
   };
 
   const handleGoogleLogin = async () => {
     setError(null);
     if (!auth) return;
-    initiateGoogleSignIn(auth).catch((err: FirebaseError) => {
-      setError(err.message);
-    });
+    try {
+      await initiateGoogleSignIn(auth);
+    } catch (err) {
+      const error = err as FirebaseError;
+      setError(error.message);
+    }
   };
 
   if (isUserLoading || user) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -86,7 +101,9 @@ export default function LoginPage() {
           <div className="mb-4 flex justify-center">
             <Icons.logo className="size-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-headline">Welcome Back!</CardTitle>
+          <CardTitle className="text-2xl font-headline">
+            Welcome Back!
+          </CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
@@ -130,7 +147,12 @@ export default function LoginPage() {
                 Login
               </Button>
             </form>
-            <Button variant="outline" className="w-full" type="button" onClick={handleGoogleLogin}>
+            <Button
+              variant="outline"
+              className="w-full"
+              type="button"
+              onClick={handleGoogleLogin}
+            >
               Continue with Google
             </Button>
           </div>

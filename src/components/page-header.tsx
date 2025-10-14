@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Globe, LogOut, Settings, User } from 'lucide-react';
 import {
   DropdownMenu,
@@ -21,8 +21,7 @@ import {
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { LANGUAGES } from '@/lib/constants';
-import { useAuth, useUser } from '@/firebase';
-import { useRouter } from 'next/navigation';
+import { useAuth, useUser, useAppState } from '@/firebase';
 import { ThemeToggle } from './theme-toggle';
 
 function capitalize(str: string) {
@@ -36,6 +35,7 @@ export default function PageHeader() {
   const { user } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const { language, setLanguage } = useAppState();
 
   const handleLogout = async () => {
     if (auth) {
@@ -53,7 +53,7 @@ export default function PageHeader() {
       <div className="ml-auto flex items-center gap-4">
         <div className="flex items-center gap-2">
           <Globe className="h-5 w-5 text-muted-foreground" />
-          <Select defaultValue="english">
+          <Select value={language} onValueChange={setLanguage}>
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
@@ -75,7 +75,7 @@ export default function PageHeader() {
               className="overflow-hidden rounded-full"
             >
               <User className="h-5 w-5" />
-               <span className="sr-only">Toggle user menu</span>
+              <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { FirebaseClientProvider } from "@/firebase";
+import { FirebaseClientProvider, AppStateProvider } from "@/firebase";
 import { ThemeProvider } from "@/components/theme-provider";
 import AppContent from "./app-content";
 import "./globals.css";
@@ -34,11 +34,13 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
         >
-          <FirebaseClientProvider>
-            <SidebarProvider>
-              <AppContent>{children}</AppContent>
-            </SidebarProvider>
-          </FirebaseClientProvider>
+          <AppStateProvider>
+            <FirebaseClientProvider>
+              <SidebarProvider>
+                <AppContent>{children}</AppContent>
+              </SidebarProvider>
+            </FirebaseClientProvider>
+          </AppStateProvider>
           <Toaster />
         </ThemeProvider>
       </body>

@@ -14,18 +14,41 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useUser, useFirestore } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
   updateProfile,
   type Auth,
+  type User,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import type { FirebaseError } from 'firebase/app';
+
+async function createUserProfile(
+  firestore: any,
+  user: User,
+  name?: string
+) {
+  const userRef = doc(firestore, 'users', user.uid);
+  return setDoc(
+    userRef,
+    {
+      id: user.uid,
+      email: user.email,
+      name: name || user.displayName,
+      preferredLanguage: 'english',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
 
 async function initiateEmailSignUp(
   auth: Auth,
+  firestore: any,
   name: string,
   email: string,
   password: string
@@ -37,17 +60,22 @@ async function initiateEmailSignUp(
   );
   if (userCredential.user) {
     await updateProfile(userCredential.user, { displayName: name });
+    await createUserProfile(firestore, userCredential.user, name);
   }
 }
 
-function initiateGoogleSignIn(auth: Auth): Promise<void> {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider).then(() => {});
+async function initiateGoogleSignIn(auth: Auth, firestore: any): Promise<void> {
+  const provider = new GoogleAuthProvider();
+  const userCredential = await signInWithPopup(auth, provider);
+  if (userCredential.user) {
+    await createUserProfile(firestore, userCredential.user);
+  }
 }
 
 export default function SignupPage() {
   const router = useRouter();
   const auth = useAuth();
+  const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -63,32 +91,38 @@ export default function SignupPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!auth) return;
-    initiateEmailSignUp(auth, name, email, password).catch(
-      (err: FirebaseError) => {
-        if (err.code === 'auth/email-already-in-use') {
-          setError('This email address is already in use.');
-        } else if (err.code === 'auth/weak-password') {
-          setError(
-            'The password is too weak. Please use a stronger password.'
-          );
-        } else {
-          setError('An unknown error occurred. Please try again.');
-        }
+    if (!auth || !firestore) return;
+    try {
+      await initiateEmailSignUp(auth, firestore, name, email, password);
+    } catch (err) {
+      const error = err as FirebaseError;
+      if (error.code === 'auth/email-already-in-use') {
+        setError('This email address is already in use.');
+      } else if (error.code === 'auth/weak-password') {
+        setError('The password is too weak. Please use a stronger password.');
+      } else {
+        setError('An unknown error occurred. Please try again.');
       }
-    );
+    }
   };
-  
+
   const handleGoogleSignUp = async () => {
     setError(null);
-    if (!auth) return;
-    initiateGoogleSignIn(auth).catch((err: FirebaseError) => {
-      setError(err.message);
-    });
+    if (!auth || !firestore) return;
+    try {
+      await initiateGoogleSignIn(auth, firestore);
+    } catch (err) {
+      const error = err as FirebaseError;
+      setError(error.message);
+    }
   };
 
   if (isUserLoading || user) {
-    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -146,7 +180,12 @@ export default function SignupPage() {
                 Create an account
               </Button>
             </form>
-            <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignUp}>
+            <Button
+              variant="outline"
+              className="w-full"
+              type="button"
+              onClick={handleGoogleSignUp}
+            >
               Continue with Google
             </Button>
           </div>

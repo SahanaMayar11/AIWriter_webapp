@@ -1,7 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, FileText, PenSquare, SpellCheck, WandSparkles } from 'lucide-react';
+import {
+  ArrowRight,
+  FileText,
+  PenSquare,
+  SpellCheck,
+  WandSparkles,
+} from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -20,7 +26,12 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import type { DraftHistory } from '@/lib/types';
-import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
+import {
+  useFirestore,
+  useUser,
+  useCollection,
+  useMemoFirebase,
+} from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 const quickActions = [
@@ -62,8 +73,19 @@ export default function DashboardPage() {
       limit(4)
     );
   }, [user, firestore]);
-  
-  const { data: recentHistory, isLoading } = useCollection<DraftHistory>(recentHistoryQuery);
+
+  const { data: recentHistory, isLoading } =
+    useCollection<DraftHistory>(recentHistoryQuery);
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return 'N/A';
+    // Firebase timestamps can be objects with seconds and nanoseconds
+    if (timestamp.seconds) {
+      return new Date(timestamp.seconds * 1000).toLocaleDateString();
+    }
+    // Or they can be strings (less common for serverTimestamps)
+    return new Date(timestamp).toLocaleDateString();
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -134,23 +156,26 @@ export default function DashboardPage() {
                   </TableCell>
                 </TableRow>
               )}
-              {recentHistory && recentHistory.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.topic}</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <Badge variant={item.type === "Draft" ? "secondary" : "outline"}>
-                      {item.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {item.language}
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
-                    {new Date(item.createdAt).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-               {recentHistory?.length === 0 && !isLoading && (
+              {recentHistory &&
+                recentHistory.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.topic}</TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      <Badge
+                        variant={item.type === 'Draft' ? 'secondary' : 'outline'}
+                      >
+                        {item.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {item.language}
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {formatDate(item.createdAt)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              {recentHistory?.length === 0 && !isLoading && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">
                     No recent activity.
