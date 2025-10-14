@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MainNav from '@/components/main-nav';
 import PageHeader from '@/components/page-header';
@@ -10,14 +11,19 @@ import { useUser } from '@/firebase';
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && !isUserLoading && !user) {
       router.push('/login');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, isHydrated]);
 
-  if (isUserLoading || !user) {
+  if (!isHydrated || isUserLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div>Loading...</div>
