@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { LANGUAGES, TONES } from '@/lib/constants';
-import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth, deleteDocumentNonBlocking } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth, deleteDocumentNonBlocking, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -90,29 +90,39 @@ export default function SettingsPage() {
     }
   }, [userProfile, reset]);
 
-  const onSubmit = async (data: ProfileFormValues) => {
+  const onSubmit = (data: ProfileFormValues) => {
     if (!userDocRef) return;
     setIsSaving(true);
-    try {
-      await updateDoc(userDocRef, {
-        ...data,
-        updatedAt: new Date(),
+    
+    const updatedData = {
+      ...data,
+      updatedAt: new Date(),
+    };
+
+    updateDoc(userDocRef, updatedData)
+      .then(() => {
+        toast({
+          title: 'Success',
+          description: 'Your profile has been updated.',
+        });
+        setIsEditing(false);
+      })
+      .catch((serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: userDocRef.path,
+          operation: 'update',
+          requestResourceData: updatedData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Could not update profile. Insufficient permissions.',
+        });
+      })
+      .finally(() => {
+        setIsSaving(false);
       });
-      toast({
-        title: 'Success',
-        description: 'Your profile has been updated.',
-      });
-      setIsEditing(false);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description:
-          error instanceof Error ? error.message : 'Could not update profile.',
-      });
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const handleCancel = () => {
