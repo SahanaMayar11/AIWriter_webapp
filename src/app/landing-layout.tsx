@@ -18,7 +18,7 @@ export default function LandingLayout({
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Home</Link>
-            <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">Features</Link>
+            <Link href="/features" className="text-sm font-medium hover:underline underline-offset-4">Features</Link>
             <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">About</Link>
             <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
           <Button variant="ghost" asChild>
