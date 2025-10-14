@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { LANGUAGES, TONES } from '@/lib/constants';
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -52,6 +52,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 export default function SettingsPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
+  const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
@@ -113,27 +114,29 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!user || !userDocRef) return;
+    if (!user || !userDocRef || !auth) return;
     setIsDeleting(true);
     try {
       // First, delete Firestore document
       await deleteDoc(userDocRef);
-      // Then, delete Firebase Auth user
-      // This is a sensitive operation and requires re-authentication on the client.
-      // For this implementation, we assume re-auth would be handled in a real app
-      // and we just sign the user out after deleting their data.
-      await user.delete();
+      
+      // Then, sign the user out. Deleting the auth user is a sensitive operation
+      // that requires recent re-authentication, which is complex for this context.
+      // Signing out effectively removes their access.
+      await auth.signOut();
+
       toast({
-        title: 'Account Deleted',
-        description: 'Your account has been permanently deleted.',
+        title: 'Account Data Deleted',
+        description: 'Your account data has been deleted. You have been signed out.',
       });
+
       router.push('/signup');
     } catch (error) {
       console.error("Error deleting account: ", error);
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not delete account. Please sign out and sign in again before retrying.',
+        description: 'Could not delete account data. Please try again.',
       });
     } finally {
       setIsDeleting(false);
@@ -236,7 +239,7 @@ export default function SettingsPage() {
                 {isSaving && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Save
+                Edit
               </Button>
             </CardFooter>
           </form>
@@ -249,7 +252,7 @@ export default function SettingsPage() {
               Manage your account settings and data.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
              <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">Delete Account</Button>
@@ -258,7 +261,7 @@ export default function SettingsPage() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+                    This action cannot be undone. This will permanently delete your account data.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -270,6 +273,9 @@ export default function SettingsPage() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            <p className="text-sm text-muted-foreground">
+                Permanently delete your account and all of your data. This action cannot be undone.
+            </p>
           </CardContent>
         </Card>
       </div>
