@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -20,8 +21,11 @@ import {
 } from "@/components/ui/tooltip"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
+const SIDEBAR_WIDTH_COOKIE_NAME = "sidebar_width"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+const SIDEBAR_WIDTH_DEFAULT = 256
+const SIDEBAR_WIDTH_MIN = 160
+const SIDEBAR_WIDTH_MAX = 520
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -34,6 +38,8 @@ type SidebarContext = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  width: number
+  setWidth: (width: number) => void
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -69,6 +75,7 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
+    const [width, setWidth] = React.useState(SIDEBAR_WIDTH_DEFAULT)
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
@@ -87,6 +94,16 @@ const SidebarProvider = React.forwardRef<
         document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
       [setOpenProp, open]
+    )
+
+    const handleSetWidth = React.useCallback(
+      (value: number | ((value: number) => number)) => {
+        const newWidth = typeof value === "function" ? value(width) : value
+        setWidth(newWidth)
+
+        document.cookie = `${SIDEBAR_WIDTH_COOKIE_NAME}=${newWidth}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      },
+      [width]
     )
 
     // Helper to toggle the sidebar.
@@ -125,8 +142,20 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        width,
+        setWidth: handleSetWidth,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [
+        state,
+        open,
+        setOpen,
+        isMobile,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+        width,
+        handleSetWidth,
+      ]
     )
 
     return (
@@ -135,7 +164,7 @@ const SidebarProvider = React.forwardRef<
           <div
             style={
               {
-                "--sidebar-width": SIDEBAR_WIDTH,
+                "--sidebar-width": `${width}px`,
                 "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
                 ...style,
               } as React.CSSProperties
@@ -289,15 +318,55 @@ const SidebarRail = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button">
 >(({ className, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { state, toggleSidebar, width, setWidth } = useSidebar()
+  const isResizing = React.useRef(false)
+  const isExpanded = state === "expanded"
+
+  const handleMouseDown = React.useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault()
+      isResizing.current = true
+
+      const handleMouseMove = (event: MouseEvent) => {
+        if (!isResizing.current) return
+        const newWidth = Math.max(
+          SIDEBAR_WIDTH_MIN,
+          Math.min(SIDEBAR_WIDTH_MAX, event.clientX)
+        )
+        setWidth(newWidth)
+      }
+
+      const handleMouseUp = () => {
+        isResizing.current = false
+        document.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mouseup", handleMouseUp)
+      }
+
+      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mouseup", handleMouseUp)
+    },
+    [setWidth]
+  )
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent the click from propagating and doing something else.
+    e.preventDefault()
+
+    // If the sidebar is collapsed, expand it.
+    // If it's expanded, we don't want to do anything on click,
+    // only on drag.
+    if (!isExpanded) {
+      toggleSidebar()
+    }
+  }
 
   return (
     <button
       ref={ref}
+      onMouseDown={isExpanded ? handleMouseDown : undefined}
+      onClick={handleClick}
       data-sidebar="rail"
       aria-label="Toggle Sidebar"
-      tabIndex={-1}
-      onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
         "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",

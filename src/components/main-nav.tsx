@@ -22,6 +22,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarRail,
 } from '@/components/ui/sidebar';
 import { useUser } from '@/firebase';
 
@@ -45,6 +46,7 @@ export default function MainNav() {
 
   return (
     <Sidebar collapsible="icon">
+        <SidebarRail />
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <Icons.logo className="size-7 text-primary" />
