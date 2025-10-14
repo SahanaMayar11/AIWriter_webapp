@@ -10,6 +10,7 @@ import {
   Settings,
   SpellCheck,
   ChevronDown,
+  WandSparkles,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import {
@@ -34,8 +35,8 @@ const navItems = [
 ];
 
 const featureItems = [
-  { href: '/outline', icon: FileText, label: 'Outline Generator' },
-  { href: '/draft', icon: PenSquare, label: 'Draft Generator' },
+  { href: '/outline', icon: FileText, label: 'New Outline' },
+  { href: '/draft', icon: PenSquare, label: 'New Draft' },
   { href: '/grammar-check', icon: SpellCheck, label: 'Grammar Check' },
 ];
 
@@ -67,13 +68,14 @@ export default function MainNav() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
-          <Collapsible>
+          <Collapsible defaultOpen>
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton
                   isActive={featureItems.some((item) => pathname.startsWith(item.href))}
-                  icon={<ChevronDown className='transform transition-transform duration-200 data-[state=open]:rotate-180'/>}
-                  className="w-full justify-start"
+                  icon={<WandSparkles />}
+                  className="w-full justify-between"
+                  suffixIcon={<ChevronDown className='transform transition-transform duration-200 data-[state=open]:rotate-180'/>}
                 >
                   Features
                 </SidebarMenuButton>
