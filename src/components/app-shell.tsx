@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MainNav from '@/components/main-nav';
 import PageHeader from '@/components/page-header';
-import { Sidebar, SidebarInset } from '@/components/ui/sidebar';
+import { Sidebar, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { useUser } from '@/firebase';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
