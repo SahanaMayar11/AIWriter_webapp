@@ -43,7 +43,7 @@ function SuggestionResult({ improvements }: { improvements: string | undefined }
         <WandSparkles className="h-16 w-16 text-muted-foreground/50" />
         <p className="mt-4 text-muted-foreground">
           Your grammar and style suggestions will appear here.
-        p>
+        </p>
       </div>
     );
   }
