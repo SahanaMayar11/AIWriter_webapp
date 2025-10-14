@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
@@ -16,47 +15,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { checkGrammarAction, type FormState, saveGrammarAction } from './actions';
-import { Skeleton } from '@/components/ui/skeleton';
 import { WandSparkles, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GenerationResult } from '@/components/generation-result';
 
 const initialState: FormState = {
   message: '',
 };
-
-function SuggestionResult({ improvements }: { improvements: string | undefined }) {
-  const { pending } = useFormStatus();
-
-  if (pending) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-      </div>
-    );
-  }
-
-  if (!improvements) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8">
-        <WandSparkles className="h-16 w-16 text-muted-foreground/50" />
-        <p className="mt-4 text-muted-foreground">
-          Your grammar and style suggestions will appear here.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="prose prose-sm dark:prose-invert max-w-none"
-      dangerouslySetInnerHTML={{ __html: improvements.replace(/\n/g, '<br />') }}
-    />
-  );
-}
 
 export function GrammarCheckForm() {
   const [state, formAction] = useActionState(checkGrammarAction, initialState);
@@ -165,7 +130,15 @@ export function GrammarCheckForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-auto min-h-[320px]">
-          <SuggestionResult improvements={state.improvements} />
+           <GenerationResult 
+             state={state}
+             render={(improvements) => <div
+                className="prose prose-sm dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: improvements.replace(/\n/g, '<br />') }}
+              />}
+             initialIcon={<WandSparkles className="h-16 w-16 text-muted-foreground/50" />}
+             initialMessage="Your grammar and style suggestions will appear here."
+           />
         </CardContent>
         {state.improvements && (
           <CardActions className="p-6 pt-0">

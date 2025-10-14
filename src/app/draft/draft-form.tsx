@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useState, useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@/components/ui/alert';
 import {
   Card,
   CardActions,
@@ -28,52 +31,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { GenerationResult } from '@/components/generation-result';
 
 const initialState: FormState = {
   message: '',
 };
-
-function GenerationResult({
-  draft,
-  formState,
-}: {
-  draft: string | undefined;
-  formState: FormState;
-}) {
-  const { pending } = useFormStatus();
-
-  if (pending) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-      </div>
-    );
-  }
-
-  if (!draft) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8">
-        <PenSquare className="h-16 w-16 text-muted-foreground/50" />
-        <p className="mt-4 text-muted-foreground">
-          Your generated draft will appear here.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <Textarea readOnly value={draft} className="min-h-[400px] text-base" />
-    </>
-  );
-}
 
 export function DraftForm() {
   const [state, formAction] = useActionState(generateDraftAction, initialState);
@@ -211,7 +173,12 @@ export function DraftForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className='min-h-[450px]'>
-          <GenerationResult draft={state.draft} formState={state} />
+          <GenerationResult 
+            state={state} 
+            render={(draft) => <Textarea readOnly value={draft} className="min-h-[400px] text-base" />}
+            initialIcon={<PenSquare className="h-16 w-16 text-muted-foreground/50" />}
+            initialMessage="Your generated draft will appear here."
+          />
         </CardContent>
         {state.draft && (
             <CardActions className='p-6 pt-0'>

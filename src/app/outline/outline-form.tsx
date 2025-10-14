@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
@@ -24,50 +23,13 @@ import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { LANGUAGES, TONES } from '@/lib/constants';
 import { generateOutlineAction, type FormState, saveOutlineAction } from './actions';
-import { Skeleton } from '@/components/ui/skeleton';
 import { FileText, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GenerationResult } from '@/components/generation-result';
 
 const initialState: FormState = {
   message: '',
 };
-
-function OutlineResult({ outline }: { outline: string | undefined }) {
-  const { pending } = useFormStatus();
-
-  if (pending) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-      </div>
-    );
-  }
-
-  if (!outline) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8">
-        <FileText className="h-16 w-16 text-muted-foreground/50" />
-        <p className="mt-4 text-muted-foreground">
-          Your generated outline will appear here.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="prose prose-sm dark:prose-invert max-w-none"
-      dangerouslySetInnerHTML={{ __html: outline.replace(/\n/g, '<br />') }}
-    />
-  );
-}
 
 export function OutlineForm() {
   const [state, formAction] = useActionState(generateOutlineAction, initialState);
@@ -221,7 +183,15 @@ export function OutlineForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-auto min-h-[450px]">
-          <OutlineResult outline={state.outline} />
+          <GenerationResult
+            state={state}
+            render={(outline) => <div
+              className="prose prose-sm dark:prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: outline.replace(/\n/g, '<br />') }}
+            />}
+            initialIcon={<FileText className="h-16 w-16 text-muted-foreground/50" />}
+            initialMessage="Your generated outline will appear here."
+          />
         </CardContent>
          {state.outline && (
             <CardActions className="p-6 pt-0">

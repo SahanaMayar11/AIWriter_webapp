@@ -4,28 +4,14 @@ import {
   generateArticleDraft,
   type GenerateArticleDraftInput,
 } from '@/ai/flows/generate-article-draft';
-import { z } from 'zod';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
-import { FieldValue } from 'firebase-admin/firestore';
-import { adminApp } from '@/firebase/admin';
-import { headers } from 'next/headers';
-
-const schema = z.object({
-  topic: z.string().min(5, 'Topic must be at least 5 characters long.'),
-  tone: z.string(),
-  wordLimit: z.coerce
-    .number()
-    .min(50, 'Word limit must be at least 50.')
-    .max(2000, 'Word limit cannot exceed 2000.'),
-});
-
-const saveSchema = z.object({
-    topic: z.string(),
-    content: z.string(),
-    language: z.string(),
-    type: z.enum(['Draft', 'Outline', 'Grammar Check'])
-});
+import { draftFormSchema, saveDraftHistorySchema } from '@/lib/schemas';
+import type { z } from 'zod';
+import { doc, serverTimestamp } from 'firebase/firestore';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { getAuthenticatedUser } from '@/lib/auth';
+import { getSdks } from '@/firebase';
+import { initializeApp, getApps } from 'firebase/app';
+import { firebaseConfig } from '@/firebase/config';
 
 export type FormState = {
   message: string;
@@ -38,7 +24,7 @@ export async function generateDraftAction(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
-  const validatedFields = schema.safeParse(
+  const validatedFields = draftFormSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
   
@@ -76,28 +62,27 @@ export async function generateDraftAction(
 }
 
 export async function saveDraftAction(
-    input: z.infer<typeof saveSchema>
+    input: z.infer<typeof saveDraftHistorySchema>
   ): Promise<{ message: string }> {
-    const headersList = headers();
-    const idToken = headersList.get('x-firebase-id-token');
-
-    if (!idToken) {
+    const user = await getAuthenticatedUser();
+    
+    if (!user) {
         return { message: 'User not authenticated.' };
     }
   
     try {
-        const decodedToken = await getAuth(adminApp).verifyIdToken(idToken);
-        const userId = decodedToken.uid;
-
-        const db = getFirestore(adminApp);
-        const docRef = db.collection('users').doc(userId).collection('draftHistories').doc();
+        if (getApps().length === 0) {
+            initializeApp(firebaseConfig);
+        }
+        const { firestore } = getSdks(getApps()[0]);
+        const docRef = doc(firestore, 'users', user.uid, 'draftHistories', Date.now().toString());
     
-        await docRef.set({
-          ...input,
-          userId,
-          createdAt: FieldValue.serverTimestamp(),
-          updatedAt: FieldValue.serverTimestamp(),
-        });
+        setDocumentNonBlocking(docRef, {
+            ...input,
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
     
         return { message: 'success' };
 
