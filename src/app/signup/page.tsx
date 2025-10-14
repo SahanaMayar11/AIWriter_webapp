@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -25,9 +26,10 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import type { FirebaseError } from 'firebase/app';
+import type { Firestore } from 'firebase/firestore';
 
 async function createUserProfile(
-  firestore: any,
+  firestore: Firestore,
   user: User,
   name?: string
 ) {
@@ -39,6 +41,7 @@ async function createUserProfile(
       email: user.email,
       name: name || user.displayName,
       preferredLanguage: 'english',
+      preferredTone: 'casual',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     },
@@ -48,7 +51,7 @@ async function createUserProfile(
 
 async function initiateEmailSignUp(
   auth: Auth,
-  firestore: any,
+  firestore: Firestore,
   name: string,
   email: string,
   password: string
@@ -64,7 +67,7 @@ async function initiateEmailSignUp(
   }
 }
 
-async function initiateGoogleSignIn(auth: Auth, firestore: any): Promise<void> {
+async function initiateGoogleSignIn(auth: Auth, firestore: Firestore): Promise<void> {
   const provider = new GoogleAuthProvider();
   const userCredential = await signInWithPopup(auth, provider);
   if (userCredential.user) {

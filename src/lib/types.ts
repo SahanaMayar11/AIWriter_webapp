@@ -1,3 +1,4 @@
+
 export type HistoryItem = {
   id: string;
   topic: string;
@@ -12,7 +13,17 @@ export type DraftHistory = {
   topic: string;
   content: string;
   language: string;
-  type: "Outline" | "Draft" | "Grammar Check" | "Style Improvement";
-  createdAt: string;
-  updatedAt: string;
+  type: "Outline" | "Draft" | "Grammar Check" | "Style Improvement" | "Playground";
+  createdAt: any;
+  updatedAt: any;
+};
+
+export type UserProfile = {
+  id: string;
+  email: string;
+  name: string;
+  preferredLanguage: string;
+  preferredTone: string;
+  createdAt: any;
+  updatedAt: any;
 };
