@@ -1,1 +1,6 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/generate-essay-outline.ts';
+import '@/ai/flows/generate-article-draft.ts';
+import '@/ai/flows/check-grammar-and-style.ts';
