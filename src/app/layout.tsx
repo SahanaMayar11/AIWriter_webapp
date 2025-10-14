@@ -7,6 +7,7 @@ import AppShell from "@/components/app-shell";
 import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase";
 import LandingLayout from "./landing-layout";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({
   children,
@@ -34,16 +35,22 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <FirebaseClientProvider>
-          <SidebarProvider>
-            {isPublicRoute ? (
-              <LandingLayout>{children}</LandingLayout>
-            ) : (
-              <AppShell>{children}</AppShell>
-            )}
-          </SidebarProvider>
-        </FirebaseClientProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <FirebaseClientProvider>
+            <SidebarProvider>
+              {isPublicRoute ? (
+                <LandingLayout>{children}</LandingLayout>
+              ) : (
+                <AppShell>{children}</AppShell>
+              )}
+            </SidebarProvider>
+          </FirebaseClientProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

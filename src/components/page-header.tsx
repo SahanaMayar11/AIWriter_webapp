@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { LANGUAGES } from '@/lib/constants';
 import { useAuth, useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
+import { ThemeToggle } from './theme-toggle';
 
 function capitalize(str: string) {
   if (!str) return '';
@@ -65,6 +66,7 @@ export default function PageHeader() {
             </SelectContent>
           </Select>
         </div>
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
