@@ -128,7 +128,7 @@ function DraftFormContent() {
         toast({
             variant: 'destructive',
             title: 'Error saving draft',
-            description: error instanceof Error ? error.message : 'An unknown error occurred.',
+            description: error instanceof Error ? error.message : String(error),
         });
     }
   };

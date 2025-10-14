@@ -96,7 +96,7 @@ export function ImproveStyleForm() {
         toast({
             variant: 'destructive',
             title: 'Error saving improvement',
-            description: error instanceof Error ? error.message : 'An unknown error occurred.',
+            description: error instanceof Error ? error.message : String(error),
         });
     }
   };

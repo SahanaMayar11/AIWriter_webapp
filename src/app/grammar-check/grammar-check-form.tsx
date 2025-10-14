@@ -97,7 +97,7 @@ export function GrammarCheckForm() {
         toast({
             variant: 'destructive',
             title: 'Error saving suggestions',
-            description: error instanceof Error ? error.message : 'An unknown error occurred.',
+            description: error instanceof Error ? error.message : String(error),
         });
     }
   };

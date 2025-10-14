@@ -114,7 +114,7 @@ export function OutlineForm() {
         toast({
             variant: 'destructive',
             title: 'Error saving outline',
-            description: error instanceof Error ? error.message : 'An unknown error occurred.',
+            description: error instanceof Error ? error.message : String(error),
         });
     }
   };
