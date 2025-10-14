@@ -24,8 +24,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { LANGUAGES, TONES } from '@/lib/constants';
-import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth } from '@/firebase';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth, deleteDocumentNonBlocking } from '@/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -116,27 +116,27 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     if (!user || !userDocRef || !auth) return;
     setIsDeleting(true);
+
+    // This now uses the non-blocking update with proper error handling
+    deleteDocumentNonBlocking(userDocRef);
+
+    // We can assume for now the client-side operation will likely succeed
+    // and proceed with signing the user out. The error emitter will
+    // catch any security rule violations.
     try {
-      // First, delete Firestore document
-      await deleteDoc(userDocRef);
-      
-      // Then, sign the user out. Deleting the auth user is a sensitive operation
-      // that requires recent re-authentication, which is complex for this context.
-      // Signing out effectively removes their access.
       await auth.signOut();
 
       toast({
-        title: 'Account Data Deleted',
-        description: 'Your account data has been deleted. You have been signed out.',
+        title: 'Account Deletion Initiated',
+        description: 'Your account data will be deleted. You have been signed out.',
       });
 
       router.push('/signup');
     } catch (error) {
-      console.error("Error deleting account: ", error);
-      toast({
+       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not delete account data. Please try again.',
+        title: 'Sign Out Error',
+        description: 'Could not sign you out after attempting to delete account data.',
       });
     } finally {
       setIsDeleting(false);
