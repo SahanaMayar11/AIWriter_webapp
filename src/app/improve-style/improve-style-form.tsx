@@ -15,11 +15,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
-import { improveStyleAction, saveImprovementAction } from './actions';
+import { improveStyleAction } from './actions';
 import { WandSparkles, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export type FormState = {
   message: string;
@@ -36,6 +38,8 @@ export function ImproveStyleForm() {
   const [state, formAction] = useActionState(improveStyleAction, initialState);
   const { toast } = useToast();
   const [text, setText] = useState(state.fields?.text || '');
+  const { user } = useUser();
+  const firestore = useFirestore();
 
   useEffect(() => {
     if (state.message && state.message !== 'success') {
@@ -65,23 +69,35 @@ export function ImproveStyleForm() {
       });
       return;
     }
-    const result = await saveImprovementAction({
-      topic: state.fields.text?.substring(0, 40) + '...' || 'Style Improvement',
-      content: state.improvedText,
-      language: 'N/A',
-      type: 'Style Improvement',
-    });
-    if (result.message === 'success') {
-      toast({
-        title: 'Saved!',
-        description: 'Your suggestions have been saved to your history.',
-      });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: result.message,
-      });
+     if (!user || !firestore) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'You must be logged in to save.',
+          });
+        return;
+    }
+    try {
+        const historyRef = collection(firestore, 'users', user.uid, 'draftHistories');
+        await addDoc(historyRef, {
+            topic: state.fields.text?.substring(0, 40) + '...' || 'Style Improvement',
+            content: state.improvedText,
+            language: 'N/A',
+            type: 'Style Improvement',
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        });
+        toast({
+            title: 'Saved!',
+            description: 'Your improvement has been saved to your history.',
+          });
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Error saving improvement',
+            description: error instanceof Error ? error.message : 'An unknown error occurred.',
+        });
     }
   };
 

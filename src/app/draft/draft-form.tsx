@@ -27,12 +27,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { TONES } from '@/lib/constants';
-import { generateDraftAction, saveDraftAction } from './actions';
+import { generateDraftAction } from './actions';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export type FormState = {
   message: string;
@@ -48,6 +50,8 @@ const initialState: FormState = {
 export function DraftForm() {
   const [state, formAction] = useActionState(generateDraftAction, initialState);
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
   
   const [topic, setTopic] = useState(state.fields?.topic || '');
   const [tone, setTone] = useState(state.fields?.tone || 'academic');
@@ -84,23 +88,36 @@ export function DraftForm() {
       });
       return;
     }
-    const result = await saveDraftAction({
-      topic: state.fields.topic || '',
-      content: state.draft,
-      language: 'English',
-      type: 'Draft',
-    });
-    if (result.message === 'success') {
-      toast({
-        title: 'Saved!',
-        description: 'Your draft has been saved to your history.',
-      });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: result.message,
-      });
+    if (!user || !firestore) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'You must be logged in to save.',
+          });
+        return;
+    }
+
+    try {
+        const historyRef = collection(firestore, 'users', user.uid, 'draftHistories');
+        await addDoc(historyRef, {
+            topic: state.fields.topic || '',
+            content: state.draft,
+            language: 'English',
+            type: 'Draft',
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        });
+        toast({
+            title: 'Saved!',
+            description: 'Your draft has been saved to your history.',
+          });
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Error saving draft',
+            description: error instanceof Error ? error.message : 'An unknown error occurred.',
+        });
     }
   };
 

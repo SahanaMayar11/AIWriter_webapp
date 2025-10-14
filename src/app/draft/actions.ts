@@ -4,13 +4,7 @@ import {
   generateArticleDraft,
   type GenerateArticleDraftInput,
 } from '@/ai/flows/generate-article-draft';
-import { draftFormSchema, saveDraftHistorySchema } from '@/lib/schemas';
-import type { z } from 'zod';
-import { doc, serverTimestamp, getFirestore } from 'firebase/firestore';
-import { getAuthenticatedUser } from '@/lib/auth';
-import { getApps, initializeApp } from 'firebase/app';
-import { firebaseConfig } from '@/firebase/config';
-import { setDoc } from 'firebase/firestore';
+import { draftFormSchema } from '@/lib/schemas';
 
 type FormState = {
   message: string;
@@ -18,7 +12,6 @@ type FormState = {
   fields?: Record<string, string>;
   issues?: string[];
 };
-
 
 export async function generateDraftAction(
   prevState: FormState,
@@ -60,39 +53,3 @@ export async function generateDraftAction(
     };
   }
 }
-
-export async function saveDraftAction(
-    input: z.infer<typeof saveDraftHistorySchema>
-  ): Promise<{ message: string }> {
-    const user = await getAuthenticatedUser();
-    
-    if (!user) {
-        return { message: 'User not authenticated.' };
-    }
-  
-    try {
-        if (getApps().length === 0) {
-            initializeApp(firebaseConfig);
-        }
-        const firestore = getFirestore();
-        const docRef = doc(firestore, 'users', user.uid, 'draftHistories', Date.now().toString());
-    
-        await setDoc(docRef, {
-            ...input,
-            userId: user.uid,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-            type: 'Draft',
-        }, { merge: true });
-    
-        return { message: 'success' };
-
-    } catch (error) {
-      console.error('Error saving draft:', error);
-      return {
-        message: `An unexpected error occurred: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      };
-    }
-  }

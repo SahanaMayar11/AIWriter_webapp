@@ -23,11 +23,13 @@ import {
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { LANGUAGES, TONES } from '@/lib/constants';
-import { generateOutlineAction, saveOutlineAction } from './actions';
+import { generateOutlineAction } from './actions';
 import { FileText, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export type FormState = {
   message: string;
@@ -43,6 +45,8 @@ const initialState: FormState = {
 export function OutlineForm() {
   const [state, formAction] = useActionState(generateOutlineAction, initialState);
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
 
   const [topic, setTopic] = useState(state.fields?.topic || '');
   const [tone, setTone] = useState(state.fields?.tone || 'academic');
@@ -80,23 +84,36 @@ export function OutlineForm() {
       });
       return;
     }
-    const result = await saveOutlineAction({
-      topic: state.fields.topic || '',
-      content: state.outline,
-      language: state.fields.language || 'english',
-      type: 'Outline',
-    });
-    if (result.message === 'success') {
-      toast({
-        title: 'Saved!',
-        description: 'Your outline has been saved to your history.',
-      });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: result.message,
-      });
+     if (!user || !firestore) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'You must be logged in to save.',
+          });
+        return;
+    }
+
+    try {
+        const historyRef = collection(firestore, 'users', user.uid, 'draftHistories');
+        await addDoc(historyRef, {
+            topic: state.fields.topic || '',
+            content: state.outline,
+            language: state.fields.language || 'english',
+            type: 'Outline',
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        });
+        toast({
+            title: 'Saved!',
+            description: 'Your outline has been saved to your history.',
+          });
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Error saving outline',
+            description: error instanceof Error ? error.message : 'An unknown error occurred.',
+        });
     }
   };
 

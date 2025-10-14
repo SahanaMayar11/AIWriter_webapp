@@ -4,12 +4,7 @@ import {
   checkGrammarAndStyle,
   type CheckGrammarAndStyleInput,
 } from '@/ai/flows/check-grammar-and-style';
-import { grammarCheckFormSchema, saveDraftHistorySchema } from '@/lib/schemas';
-import type { z } from 'zod';
-import { doc, serverTimestamp, setDoc, getFirestore } from 'firebase/firestore';
-import { getAuthenticatedUser } from '@/lib/auth';
-import { initializeApp, getApps } from 'firebase/app';
-import { firebaseConfig } from '@/firebase/config';
+import { grammarCheckFormSchema } from '@/lib/schemas';
 
 type FormState = {
   message: string;
@@ -58,37 +53,3 @@ export async function checkGrammarAction(
     };
   }
 }
-
-export async function saveGrammarAction(
-    input: z.infer<typeof saveDraftHistorySchema>
-  ): Promise<{ message: string }> {
-    const user = await getAuthenticatedUser();
-    if (!user) {
-        return { message: 'User not authenticated.' };
-    }
-  
-    try {
-        if (getApps().length === 0) {
-            initializeApp(firebaseConfig);
-        }
-        const firestore = getFirestore();
-        const docRef = doc(firestore, 'users', user.uid, 'draftHistories', Date.now().toString());
-    
-        await setDoc(docRef, {
-          ...input,
-          userId: user.uid,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        }, { merge: true });
-    
-        return { message: 'success' };
-
-    } catch (error) {
-      console.error('Error saving grammar check:', error);
-      return {
-        message: `An unexpected error occurred: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      };
-    }
-  }
