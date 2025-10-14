@@ -1,13 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  Globe,
-  LogOut,
-  Settings,
-  User,
-} from "lucide-react";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Globe, LogOut, Settings, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,20 +10,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { LANGUAGES } from "@/lib/constants";
+} from '@/components/ui/select';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { LANGUAGES } from '@/lib/constants';
+import { useAuth, useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -36,14 +33,24 @@ function capitalize(str: string) {
 
 export default function PageHeader() {
   const pathname = usePathname();
-  const pageName = pathname.split("/").pop() || "Dashboard";
-  const userAvatar = PlaceHolderImages.find((img) => img.id === "user-avatar");
+  const pageName = pathname.split('/').pop() || 'Dashboard';
+  const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar');
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    if (auth) {
+      await auth.signOut();
+      router.push('/login');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SidebarTrigger className="md:hidden" />
       <h1 className="text-xl font-semibold md:text-2xl font-headline hidden sm:block">
-        {capitalize(pageName.replace("-", " "))}
+        {capitalize(pageName.replace('-', ' '))}
       </h1>
       <div className="ml-auto flex items-center gap-4">
         <div className="flex items-center gap-2">
@@ -69,16 +76,27 @@ export default function PageHeader() {
               className="overflow-hidden rounded-full"
             >
               <Avatar>
-                {userAvatar && (
+                {user?.photoURL ? (
                   <Image
-                    src={userAvatar.imageUrl}
-                    alt={userAvatar.description}
+                    src={user.photoURL}
+                    alt={user.displayName || 'User avatar'}
                     width={36}
                     height={36}
-                    data-ai-hint={userAvatar.imageHint}
                   />
+                ) : (
+                  userAvatar && (
+                    <Image
+                      src={userAvatar.imageUrl}
+                      alt={userAvatar.description}
+                      width={36}
+                      height={36}
+                      data-ai-hint={userAvatar.imageHint}
+                    />
+                  )
                 )}
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarFallback>
+                  {user?.displayName?.charAt(0) || 'U'}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
@@ -98,11 +116,9 @@ export default function PageHeader() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/login">
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Link>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

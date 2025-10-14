@@ -1,53 +1,78 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Icons } from "@/components/icons";
-import { useAuth, useUser, initiateEmailSignUp } from "@/firebase";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Icons } from '@/components/icons';
+import { useAuth, useUser } from '@/firebase';
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  type Auth,
+} from 'firebase/auth';
 import type { FirebaseError } from 'firebase/app';
+
+async function initiateEmailSignUp(
+  auth: Auth,
+  name: string,
+  email: string,
+  password: string
+): Promise<void> {
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  if (userCredential.user) {
+    await updateProfile(userCredential.user, { displayName: name });
+  }
+}
 
 export default function SignupPage() {
   const router = useRouter();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      router.push("/dashboard");
+      router.push('/dashboard');
     }
   }, [user, isUserLoading, router]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    initiateEmailSignUp(auth, email, password)
-      .catch((err: FirebaseError) => {
+    if (!auth) return;
+    initiateEmailSignUp(auth, name, email, password).catch(
+      (err: FirebaseError) => {
         if (err.code === 'auth/email-already-in-use') {
           setError('This email address is already in use.');
         } else if (err.code === 'auth/weak-password') {
-          setError('The password is too weak. Please use a stronger password.');
+          setError(
+            'The password is too weak. Please use a stronger password.'
+          );
         } else {
           setError('An unknown error occurred. Please try again.');
         }
-      });
+      }
+    );
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || user) {
     return <div>Loading...</div>;
   }
 
@@ -109,7 +134,7 @@ export default function SignupPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link href="/login" className="underline">
               Login
             </Link>
