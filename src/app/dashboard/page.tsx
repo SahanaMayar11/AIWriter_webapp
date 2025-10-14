@@ -8,6 +8,7 @@ import {
   PenSquare,
   SpellCheck,
   WandSparkles,
+  Lightbulb,
 } from 'lucide-react';
 import {
   Card,
@@ -17,23 +18,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import type { DraftHistory } from '@/lib/types';
-import {
-  useFirestore,
-  useUser,
-  useCollection,
-  useMemoFirebase,
-} from '@/firebase';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { useUser } from '@/firebase';
 
 const quickActions = [
   {
@@ -64,29 +49,6 @@ const quickActions = [
 
 export default function DashboardPage() {
   const { user } = useUser();
-  const firestore = useFirestore();
-
-  const recentHistoryQuery = useMemoFirebase(() => {
-    if (!user || !firestore) return null;
-    return query(
-      collection(firestore, 'users', user.uid, 'draftHistories'),
-      orderBy('createdAt', 'desc'),
-      limit(4)
-    );
-  }, [user, firestore]);
-
-  const { data: recentHistory, isLoading } =
-    useCollection<DraftHistory>(recentHistoryQuery);
-
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return 'N/A';
-    // Firebase timestamps can be objects with seconds and nanoseconds
-    if (timestamp.seconds) {
-      return new Date(timestamp.seconds * 1000).toLocaleDateString();
-    }
-    // Or they can be strings (less common for serverTimestamps)
-    return new Date(timestamp).toLocaleDateString();
-  };
   
   const getFirstName = () => {
     if (!user?.displayName) return 'there';
@@ -105,7 +67,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {quickActions.map((action) => (
           <Card
             key={action.title}
@@ -133,64 +95,23 @@ export default function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="font-headline">Recent Activity</CardTitle>
-              <CardDescription>
-                A quick look at your latest creations.
-              </CardDescription>
-            </div>
-            <Button asChild variant="outline">
-              <Link href="/history">View All</Link>
-            </Button>
-          </div>
+            <CardTitle className="font-headline flex items-center gap-2">
+                <Lightbulb className="h-6 w-6 text-primary"/>
+                Writing Prompt of the Day
+            </CardTitle>
+            <CardDescription>
+                Use this prompt to spark your creativity.
+            </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Topic</TableHead>
-                <TableHead className="hidden sm:table-cell">Type</TableHead>
-                <TableHead className="hidden md:table-cell">Language</TableHead>
-                <TableHead className="text-right">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading && (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              )}
-              {recentHistory &&
-                recentHistory.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.topic}</TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <Badge
-                        variant={item.type === 'Draft' ? 'secondary' : 'outline'}
-                      >
-                        {item.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {item.language}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {formatDate(item.createdAt)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {recentHistory?.length === 0 && !isLoading && (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center">
-                    No recent activity.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+            <blockquote className="border-l-2 pl-6 italic text-lg">
+            &quot;The old lighthouse keeper found a message in a bottle, but it wasn&apos;t from this time.&quot;
+            </blockquote>
+             <Button asChild variant="link" className="px-0 mt-4">
+                <Link href="/playground?prompt=The old lighthouse keeper found a message in a bottle, but it wasn't from this time.">
+                  Start Writing <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
         </CardContent>
       </Card>
     </div>

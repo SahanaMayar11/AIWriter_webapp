@@ -10,10 +10,10 @@ export default function AppContent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const publicRoutes = ["/", "/login", "/signup", "/features"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const publicRoutes = ["/", "/login", "/signup"];
+  const isPublicRoute = publicRoutes.includes(pathname) || pathname === '/features';
 
-  return isPublicRoute ? (
+  return isPublicRoute && pathname !== '/features' ? (
     <LandingLayout>{children}</LandingLayout>
   ) : (
     <AppShell>{children}</AppShell>
