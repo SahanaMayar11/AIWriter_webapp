@@ -10,16 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Form,
-Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -35,7 +25,8 @@ import { TONES } from "@/lib/constants";
 import { generateDraftAction, type FormState } from "./actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFormStatus } from "react-dom";
-import { Terminal } from "lucide-react";
+import { PenSquare, Terminal } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 const initialState: FormState = {
   message: "",

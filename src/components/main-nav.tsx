@@ -51,15 +51,16 @@ export default function MainNav() {
         <SidebarMenu>
           {navItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <Link href={item.href} legacyBehavior passHref>
-                <SidebarMenuButton
-                  isActive={pathname === item.href}
-                  icon={<item.icon />}
-                  tooltip={item.label}
-                >
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === item.href}
+                icon={<item.icon />}
+                tooltip={item.label}
+              >
+                <Link href={item.href}>
                   {item.label}
-                </SidebarMenuButton>
-              </Link>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -87,9 +88,9 @@ export default function MainNav() {
             </span>
           </div>
         </div>
-        <Link href="/settings" legacyBehavior passHref>
-          <SidebarMenuButton icon={<Settings />} tooltip="Settings" size="icon" />
-        </Link>
+        <SidebarMenuButton asChild icon={<Settings />} tooltip="Settings" size="icon" >
+          <Link href="/settings" />
+        </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
   );
