@@ -1,0 +1,117 @@
+/**
+ * @file Firebase Security Rules for LinguaCraft AI.
+ *
+ * @description This ruleset enforces a strict user-ownership model for user profiles and draft histories.
+ *   Admin privileges are granted based on the existence of a document in the /roles_admin collection.
+ *   The rules are designed for security, scalability, and ease of debugging by adhering to
+ *   Authorization Independence, Clarity of Intent, DBAC (Database Access Control), and QAPs (Query Approval Patterns).
+ *
+ * @dataStructure
+ *   /users/{userId}: Stores user profile information. Only the user can read/write their own profile.
+ *   /users/{userId}/draftHistories/{draftHistoryId}: Stores draft histories for each user. Only the user can access their own drafts.
+ *   /roles_admin/{adminId}: Collection of admin users. Existence of a document grants admin privileges.
+ *
+ * @keySecurityDecisions
+ *   - Users can only access their own data (profiles and draft histories).
+ *   - Listing all users is disallowed.
+ *   - Admin privileges are determined by the presence of a document in `/roles_admin`.
+ *   - Data validation is relaxed in this prototyping phase, focusing on authorization.
+ *
+ * @denormalizationForAuthorization
+ *   - Path-based ownership is used extensively to avoid `get()` calls in security rules. User data and
+ *     associated drafts are stored in hierarchical paths (e.g., /users/{userId}/draftHistories/{draftHistoryId})
+ *     to leverage Firestore's security rules effectively.
+ *
+ * @structuralSegregation
+ *   - User data and admin data are stored in separate collections to apply different security rules.
+ *     Draft histories are stored as subcollections of users, enabling easy querying of a user's drafts.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Defines a function to check if the current user is signed in.
+     * @returns {bool} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Defines a function to check if the current user is the owner of the document.
+     * @param {string} userId The user ID to compare against the authenticated user's ID.
+     * @returns {bool} True if the user is the owner, false otherwise.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Defines a function to check if the current user is the owner of the document,
+     *   and that the document exists (for update and delete operations).
+     * @param {string} userId The user ID to compare against the authenticated user's ID.
+     * @returns {bool} True if the user is the owner and the document exists, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Checks if the user is an admin by verifying the existence of their ID in the /roles_admin collection.
+     * @returns {bool} True if the user is an admin, false otherwise.
+     */
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /**
+     * @description Rules for /users/{userId} documents.
+     * @path /users/{userId}
+     * @allow (create) Signed-in user with matching userId in the document data.
+     * @allow (get, update, delete) Owner of the document.
+     * @deny (create) Non-signed-in user.
+     * @deny (create) Signed-in user with non-matching userId in the document data.
+     * @deny (get, update, delete) Non-owner of the document.
+     * @principle Enforces document ownership for writes. Restricts access to a user's own data tree.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Do not allow listing of all users.
+      allow create: if isSignedIn() && request.auth.uid == userId && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability of the id field
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for /users/{userId}/draftHistories/{draftHistoryId} documents.
+     * @path /users/{userId}/draftHistories/{draftHistoryId}
+     * @allow (create, get, update, delete) Owner of the parent user document.
+     * @deny (create, get, update, delete) Non-owner of the parent user document.
+     * @principle Restricts access to a user's own draft histories. Enforces document ownership.
+     */
+    match /users/{userId}/draftHistories/{draftHistoryId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for /roles_admin/{adminId} documents.
+     * @path /roles_admin/{adminId}
+     * @allow (get) Any signed-in user can check for admin existence.
+     * @allow (create, update, delete) Only admins can manage other admins.
+     * @deny (create, update, delete) Non-admins.
+     * @principle Restricts admin role management to existing admins.
+     */
+    match /roles_admin/{adminId} {
+      allow get: if isSignedIn();
+      allow list: if false;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}
