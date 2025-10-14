@@ -1,3 +1,4 @@
+
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -10,12 +11,12 @@ export default function AppContent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const publicRoutes = ["/", "/login", "/signup"];
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname === '/features';
+  const publicRoutes = ["/", "/login", "/signup", "/features"];
+  const isPublicRoute = publicRoutes.includes(pathname);
 
-  return isPublicRoute && pathname !== '/features' ? (
-    <LandingLayout>{children}</LandingLayout>
-  ) : (
-    <AppShell>{children}</AppShell>
-  );
+  if (isPublicRoute) {
+    return <LandingLayout>{children}</LandingLayout>;
+  }
+
+  return <AppShell>{children}</AppShell>;
 }
