@@ -83,12 +83,6 @@ export default function PageHeader() {
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/settings">
-                <User className="mr-2 h-4 w-4" />
-                Profile
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/settings">
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Link>

@@ -18,7 +18,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogTrigger,
-  DialogClose,
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
@@ -92,7 +91,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={(isOpen) => !isOpen && setSelectedItem(null)}>
       <Card>
         <CardHeader>
           <CardTitle className="font-headline">Writing History</CardTitle>
@@ -124,7 +123,7 @@ export default function HistoryPage() {
               {history &&
                 history.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.topic}</TableCell>
+                    <TableCell className="font-medium max-w-[200px] truncate">{item.topic}</TableCell>
                     <TableCell className="hidden md:table-cell">
                       <Badge
                         variant={item.type === 'Draft' ? 'default' : 'secondary'}

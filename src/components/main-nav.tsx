@@ -98,6 +98,7 @@ export default function MainNav() {
           icon={<Settings />}
           tooltip="Settings"
           size="icon"
+          isActive={pathname === '/settings'}
         >
           <Link href="/settings" />
         </SidebarMenuButton>
