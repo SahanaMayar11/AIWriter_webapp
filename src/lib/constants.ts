@@ -13,3 +13,11 @@ export const TONES = [
   { value: "formal", label: "Formal" },
   { value: "persuasive", label: "Persuasive" },
 ];
+
+export const PURPOSES = [
+    { value: 'essay', label: 'Essay' },
+    { value: 'article', label: 'Article' },
+    { value: 'blog-post', label: 'Blog Post' },
+    { value: 'report', label: 'Report' },
+    { value: 'story', label: 'Story' },
+];

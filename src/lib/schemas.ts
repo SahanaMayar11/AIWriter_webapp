@@ -32,5 +32,13 @@ export const saveDraftHistorySchema = z.object({
     topic: z.string(),
     content: z.string(),
     language: z.string(),
-    type: z.enum(['Draft', 'Outline', 'Grammar Check', 'Style Improvement'])
+    type: z.enum(['Draft', 'Outline', 'Grammar Check', 'Style Improvement', 'Playground'])
+});
+
+export const playgroundFormSchema = z.object({
+  topic: z.string().min(5, 'Topic must be at least 5 characters long.'),
+  tone: z.string(),
+  purpose: z.string(),
+  content: z.string().optional(),
+  action: z.string(),
 });

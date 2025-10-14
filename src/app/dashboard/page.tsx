@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, FileText, PenSquare, SpellCheck } from 'lucide-react';
+import { ArrowRight, FileText, PenSquare, SpellCheck, WandSparkles } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -24,6 +24,12 @@ import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebas
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 const quickActions = [
+  {
+    title: 'Playground',
+    description: 'A unified space for all your writing tasks.',
+    href: '/playground',
+    icon: WandSparkles,
+  },
   {
     title: 'New Outline',
     description: 'Generate a structured outline for your essay or article.',
