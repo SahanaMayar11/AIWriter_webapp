@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppShell from "@/components/app-shell";
 import "./globals.css";
+import { FirebaseClientProvider } from "@/firebase";
 
 // Metadata can't be exported from a client component.
 // We can move it to a new server-side layout file if needed,
@@ -39,9 +40,11 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <SidebarProvider>
-          {showShell ? <AppShell>{children}</AppShell> : children}
-        </SidebarProvider>
+        <FirebaseClientProvider>
+          <SidebarProvider>
+            {showShell ? <AppShell>{children}</AppShell> : children}
+          </SidebarProvider>
+        </FirebaseClientProvider>
         <Toaster />
       </body>
     </html>
