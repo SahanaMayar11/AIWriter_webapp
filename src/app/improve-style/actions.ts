@@ -6,8 +6,7 @@ import {
 } from '@/ai/flows/improve-style';
 import { improveStyleFormSchema, saveDraftHistorySchema } from '@/lib/schemas';
 import type { z } from 'zod';
-import { doc, serverTimestamp } from 'firebase/firestore';
-import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getAuthenticatedUser } from '@/lib/auth';
 import { getSdks } from '@/firebase';
 import { initializeApp, getApps } from 'firebase/app';
@@ -69,7 +68,7 @@ export async function saveImprovementAction(
         const { firestore } = getSdks(getApps()[0]);
         const docRef = doc(firestore, 'users', user.uid, 'draftHistories', Date.now().toString());
     
-        setDocumentNonBlocking(docRef, {
+        await setDoc(docRef, {
           ...input,
           userId: user.uid,
           createdAt: serverTimestamp(),

@@ -78,7 +78,7 @@ export async function saveDraftAction(
         const { firestore } = getSdks(getApps()[0]);
         const docRef = doc(firestore, 'users', user.uid, 'draftHistories', Date.now().toString());
     
-        setDocumentNonBlocking(docRef, {
+        await setDoc(docRef, {
             ...input,
             userId: user.uid,
             createdAt: serverTimestamp(),
