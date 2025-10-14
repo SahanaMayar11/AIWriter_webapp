@@ -57,7 +57,6 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   const userDocRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -105,7 +104,6 @@ export default function SettingsPage() {
           title: 'Success',
           description: 'Your profile has been updated.',
         });
-        setIsEditing(false);
       })
       .catch((serverError) => {
         const permissionError = new FirestorePermissionError({
@@ -114,27 +112,11 @@ export default function SettingsPage() {
           requestResourceData: updatedData,
         });
         errorEmitter.emit('permission-error', permissionError);
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Could not update profile. Insufficient permissions.',
-        });
       })
       .finally(() => {
         setIsSaving(false);
       });
   };
-
-  const handleCancel = () => {
-    if (userProfile) {
-        reset({
-            name: userProfile.name || '',
-            preferredLanguage: userProfile.preferredLanguage || 'english',
-            preferredTone: userProfile.preferredTone || 'casual',
-        });
-    }
-    setIsEditing(false);
-  }
 
   const handleDeleteAccount = async () => {
     if (!user || !userDocRef || !auth) return;
@@ -190,7 +172,7 @@ export default function SettingsPage() {
                     <Controller
                       name="name"
                       control={control}
-                      render={({ field }) => <Input id="name" {...field} disabled={!isEditing} />}
+                      render={({ field }) => <Input id="name" {...field} />}
                     />
                     {errors.name && (
                       <p className="text-sm text-destructive">
@@ -214,7 +196,6 @@ export default function SettingsPage() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={!isEditing}
                         >
                           <SelectTrigger id="language">
                             <SelectValue placeholder="Select language" />
@@ -236,7 +217,7 @@ export default function SettingsPage() {
                       name="preferredTone"
                       control={control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value} disabled={!isEditing}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger id="tone">
                             <SelectValue placeholder="Select tone" />
                           </SelectTrigger>
@@ -255,21 +236,12 @@ export default function SettingsPage() {
               </div>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              {isEditing ? (
-                  <div className="flex gap-2">
-                    <Button type="submit" disabled={isSaving}>
-                        {isSaving && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Save Changes
-                    </Button>
-                    <Button variant="outline" type="button" onClick={handleCancel}>
-                        Cancel
-                    </Button>
-                  </div>
-              ) : (
-                <Button type="button" onClick={() => setIsEditing(true)}>Edit</Button>
-              )}
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Update Profile
+                </Button>
             </CardFooter>
           </form>
         </Card>
