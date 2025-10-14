@@ -1,22 +1,16 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import AppShell from "@/components/app-shell";
-import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase";
-import LandingLayout from "./landing-layout";
 import { ThemeProvider } from "@/components/theme-provider";
+import AppContent from "./app-content";
+import "./globals.css";
+
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const publicRoutes = ["/", "/login", "/signup", "/features"];
-  const isPublicRoute = publicRoutes.includes(pathname);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -42,11 +36,7 @@ export default function RootLayout({
         >
           <FirebaseClientProvider>
             <SidebarProvider>
-              {isPublicRoute ? (
-                <LandingLayout>{children}</LandingLayout>
-              ) : (
-                <AppShell>{children}</AppShell>
-              )}
+              <AppContent>{children}</AppContent>
             </SidebarProvider>
           </FirebaseClientProvider>
           <Toaster />
