@@ -33,7 +33,11 @@ const prompt = ai.definePrompt({
   name: 'checkGrammarAndStylePrompt',
   input: {schema: CheckGrammarAndStyleInputSchema},
   output: {schema: CheckGrammarAndStyleOutputSchema},
-  prompt: `You are an expert writing assistant. Review the following text and suggest improvements to grammar, style, and clarity. Provide specific suggestions and explain why they are needed.\n\nText: {{{text}}}`,
+  prompt: `You are an expert writing assistant. Review the following text and suggest improvements to grammar, style, and clarity. Provide specific suggestions and explain why they are needed.
+
+  Format your response using simple markdown, such as headings, lists, and bold text.
+
+  Text: {{{text}}}`,
 });
 
 const checkGrammarAndStyleFlow = ai.defineFlow(

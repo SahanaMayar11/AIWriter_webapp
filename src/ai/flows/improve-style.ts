@@ -33,7 +33,11 @@ const prompt = ai.definePrompt({
   name: 'improveStylePrompt',
   input: {schema: ImproveStyleInputSchema},
   output: {schema: ImproveStyleOutputSchema},
-  prompt: `You are an expert writing assistant. Review the following text and improve its style, clarity, and engagement. Provide a rewritten version of the text.\n\nText: {{{text}}}`,
+  prompt: `You are an expert writing assistant. Review the following text and improve its style, clarity, and engagement. Provide a rewritten version of the text.
+
+  Format the improved text using simple markdown for paragraphs and spacing.
+
+  Text: {{{text}}}`,
 });
 
 const improveStyleFlow = ai.defineFlow(

@@ -37,6 +37,8 @@ const generateArticleDraftPrompt = ai.definePrompt({
 
   Based on the user's input, generate an article draft with the specified topic, tone, and word limit.
 
+  Use simple markdown for formatting, like headings (#, ##) and paragraphs.
+
   Topic: {{{topic}}}
   Tone: {{{tone}}}
   Word Limit: {{{wordLimit}}}

@@ -208,7 +208,10 @@ export function DraftForm() {
         <CardContent className='min-h-[450px]'>
           <GenerationResult 
             state={state} 
-            render={(draft) => <Textarea readOnly value={draft} className="min-h-[400px] text-base" />}
+            render={(draft) => <div
+                className="prose prose-sm dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: draft.replace(/\n/g, '<br />') }}
+              />}
             initialIcon={<PenSquare className="h-16 w-16 text-muted-foreground/50" />}
             initialMessage="Your generated draft will appear here."
           />

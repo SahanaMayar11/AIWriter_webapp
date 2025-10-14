@@ -37,6 +37,8 @@ const generateEssayOutlinePrompt = ai.definePrompt({
   prompt: `You are an AI writing assistant that helps users generate essay outlines.
 
   Based on the topic, tone, word limit, and language provided, generate a detailed essay outline.
+  
+  Format the outline using simple markdown, including headings (#, ##), lists (* or -), and bold text for key terms.
 
   Topic: {{{topic}}}
   Tone: {{{tone}}}
