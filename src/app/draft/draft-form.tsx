@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useEffect, useState, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
@@ -25,7 +25,6 @@ import { useToast } from '@/hooks/use-toast';
 import { TONES } from '@/lib/constants';
 import { generateDraftAction, type FormState, saveDraftAction } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useFormStatus } from 'react-dom';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -77,7 +76,7 @@ function GenerationResult({
 }
 
 export function DraftForm() {
-  const [state, formAction] = useFormState(generateDraftAction, initialState);
+  const [state, formAction] = useActionState(generateDraftAction, initialState);
   const { toast } = useToast();
   
   const [topic, setTopic] = useState(state.fields?.topic || '');

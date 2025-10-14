@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useState, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
@@ -70,7 +70,7 @@ function OutlineResult({ outline }: { outline: string | undefined }) {
 }
 
 export function OutlineForm() {
-  const [state, formAction] = useFormState(generateOutlineAction, initialState);
+  const [state, formAction] = useActionState(generateOutlineAction, initialState);
   const { toast } = useToast();
 
   const [topic, setTopic] = useState(state.fields?.topic || '');

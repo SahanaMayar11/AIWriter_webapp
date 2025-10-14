@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useState, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
@@ -59,7 +59,7 @@ function SuggestionResult({ improvements }: { improvements: string | undefined }
 }
 
 export function GrammarCheckForm() {
-  const [state, formAction] = useFormState(checkGrammarAction, initialState);
+  const [state, formAction] = useActionState(checkGrammarAction, initialState);
   const { toast } = useToast();
   const [text, setText] = useState(state.fields?.text || '');
 
