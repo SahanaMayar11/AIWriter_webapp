@@ -42,7 +42,7 @@ const generateArticleDraftPrompt = ai.definePrompt({
   {{{outline}}}
   {{/if}}
 
-  Use simple markdown for formatting, like headings (#, ##) and paragraphs.
+  Format your response using simple markdown, such as headings, lists, and bold text.
 
   Topic: {{{topic}}}
   Tone: {{{tone}}}

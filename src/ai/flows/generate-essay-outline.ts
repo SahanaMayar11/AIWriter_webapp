@@ -4,7 +4,7 @@
  * @fileOverview This file defines a Genkit flow for generating essay outlines.
  *
  * - generateEssayOutline - A function that generates an essay outline based on the provided input.
- * - GenerateEssayOutlineInput - The input type for the generateEssayOutline function.
+ * - GenerateEssayOutlineInput - The input type for the generateEssayOutline functionदीप
  * - GenerateEssayOutlineOutput - The return type for the generateEssayOutline function.
  */
 

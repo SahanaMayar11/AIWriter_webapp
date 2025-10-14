@@ -1,6 +1,6 @@
 'use client';
 import { playgroundAction } from './actions';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useState, useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,29 +21,24 @@ import {
   Download,
   Loader2
 } from 'lucide-react';
-import { TONES } from '@/lib/constants';
+import { TONES, PURPOSES } from '@/lib/constants';
 import { useUser, useFirestore } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
-const PURPOSES = [
-  { value: 'essay', label: 'Essay' },
-  { value: 'article', label: 'Article' },
-  { value: 'blog-post', label: 'Blog Post' },
-  { value: 'report', label: 'Report' },
-  { value: 'story', label: 'Story' },
-];
-
 const initialState = {
   message: '',
+  result: '',
 };
 
 export default function PlaygroundPage() {
   const [state, formAction] = useActionState(playgroundAction, initialState);
+  const [isPending, startTransition] = useTransition();
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
+
   const [topic, setTopic] = useState('');
   const [tone, setTone] = useState('professional');
   const [purpose, setPurpose] = useState('essay');
   const [content, setContent] = useState('');
-  const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   const { toast } = useToast();
   const { user } = useUser();
@@ -56,22 +51,25 @@ export default function PlaygroundPage() {
         title: 'Success!',
         description: 'Content has been generated.',
       });
-    } else if (state.message && state.message !== 'success') {
+    } else if (state.message && state.message !== 'success' && state.message !== '') {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: state.message,
       });
     }
-    setPendingAction(null);
+    
+    if (state.action) {
+      setPendingAction(null);
+    }
   }, [state, toast]);
 
-  const handleFormAction = (e: React.FormEvent<HTMLFormElement>) => {
-    const formData = new FormData(e.currentTarget);
-    const action = (e.nativeEvent as any).submitter.value;
-    formData.set('action', action);
+  const handleFormAction = (formData: FormData) => {
+    const action = formData.get('action') as string;
     setPendingAction(action);
-    formAction(formData);
+    startTransition(() => {
+        formAction(formData);
+    });
   };
 
   const handleSave = async () => {
@@ -95,7 +93,7 @@ export default function PlaygroundPage() {
     try {
       const historyRef = collection(firestore, 'users', user.uid, 'draftHistories');
       await addDoc(historyRef, {
-        topic: topic || 'Untitled',
+        topic: topic || 'Untitled Playground Draft',
         content: content,
         language: 'English',
         type: 'Playground',
@@ -136,8 +134,10 @@ export default function PlaygroundPage() {
     URL.revokeObjectURL(url);
   };
   
+  const anyActionPending = isPending && pendingAction;
+
   return (
-    <form onSubmit={handleFormAction} className="flex flex-col h-full gap-4">
+    <form action={handleFormAction} className="flex flex-col h-full gap-4">
       <div className="flex flex-wrap items-center gap-4 p-4 border rounded-lg bg-card">
         <div className="flex-1 min-w-[200px] space-y-1">
           <label htmlFor="topic" className="text-sm font-medium">Topic</label>
@@ -155,7 +155,6 @@ export default function PlaygroundPage() {
                   {t.label}
                 </SelectItem>
               ))}
-              <SelectItem value="professional">Professional</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -177,28 +176,28 @@ export default function PlaygroundPage() {
       </div>
       
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" name="action" value="outline" variant="outline" disabled={!!pendingAction}>
+        <Button type="submit" name="action" value="outline" variant="outline" disabled={anyActionPending}>
           {pendingAction === 'outline' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
           Generate Outline
         </Button>
-        <Button type="submit" name="action" value="draft" variant="outline" disabled={!!pendingAction}>
+        <Button type="submit" name="action" value="draft" variant="outline" disabled={anyActionPending}>
           {pendingAction === 'draft' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PenSquare className="mr-2 h-4 w-4" />}
           Create Draft
         </Button>
-        <Button type="submit" name="action" value="grammar" variant="outline" disabled={!!pendingAction}>
+        <Button type="submit" name="action" value="grammar" variant="outline" disabled={anyActionPending}>
           {pendingAction === 'grammar' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <SpellCheck className="mr-2 h-4 w-4" />}
           Check Grammar
         </Button>
-        <Button type="submit" name="action" value="style" variant="outline" disabled={!!pendingAction}>
+        <Button type="submit" name="action" value="style" variant="outline" disabled={anyActionPending}>
           {pendingAction === 'style' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <WandSparkles className="mr-2 h-4 w-4" />}
           Improve Style
         </Button>
         <div className="ml-auto flex items-center gap-2">
-           <Button type="button" variant="outline" onClick={handleSave}>
+           <Button type="button" variant="outline" onClick={handleSave} disabled={anyActionPending}>
               <Save className="mr-2 h-4 w-4" />
               Save Draft
             </Button>
-            <Button type="button" variant="outline" onClick={handleExport}>
+            <Button type="button" variant="outline" onClick={handleExport} disabled={anyActionPending}>
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>

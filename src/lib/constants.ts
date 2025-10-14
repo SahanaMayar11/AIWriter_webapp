@@ -12,6 +12,7 @@ export const TONES = [
   { value: "casual", label: "Casual" },
   { value: "formal", label: "Formal" },
   { value: "persuasive", label: "Persuasive" },
+  { value: "professional", label: "Professional" },
 ];
 
 export const PURPOSES = [

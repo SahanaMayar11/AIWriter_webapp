@@ -1,20 +1,16 @@
 'use server';
 
 import {
-  generateEssayOutline,
-  type GenerateEssayOutlineInput,
+  generateEssayOutline
 } from '@/ai/flows/generate-essay-outline';
 import {
-  generateArticleDraft,
-  type GenerateArticleDraftInput,
+  generateArticleDraft
 } from '@/ai/flows/generate-article-draft';
 import {
-  checkGrammarAndStyle,
-  type CheckGrammarAndStyleInput,
+  checkGrammarAndStyle
 } from '@/ai/flows/check-grammar-and-style';
 import {
     improveStyle,
-    type ImproveStyleInput,
 } from '@/ai/flows/improve-style';
 import { playgroundFormSchema } from '@/lib/schemas';
 
@@ -33,48 +29,43 @@ export async function playgroundAction(
   const fields = Object.fromEntries(formData.entries());
   const action = fields.action as string;
 
+  const validatedFields = playgroundFormSchema.safeParse(fields);
+
+  if (!validatedFields.success) {
+    return {
+      message: 'Please check your input and try again.',
+      fields,
+      action,
+      issues: validatedFields.error.issues.map((issue) => issue.message),
+    };
+  }
+  
+  const { topic, tone, purpose, content } = validatedFields.data;
+
   try {
     let result: { [key: string]: any } | null = null;
     let resultKey: string = '';
 
     if (action === 'outline') {
-      const validatedFields = playgroundFormSchema.safeParse(fields);
-       if (!validatedFields.success) {
-        return {
-          message: 'Please check your input and try again.',
-          fields,
-          action,
-          issues: validatedFields.error.issues.map((issue) => issue.message),
-        };
-      }
       result = await generateEssayOutline({
-        topic: validatedFields.data.topic,
-        tone: validatedFields.data.tone,
-        language: 'english', // Hardcoded for now
-        wordLimit: 1000, // Hardcoded for now
+        topic: topic,
+        tone: tone,
+        language: 'english', 
+        wordLimit: 1000, 
       });
       resultKey = 'outline';
     } else if (action === 'draft') {
-        const validatedFields = playgroundFormSchema.safeParse(fields);
-        if (!validatedFields.success) {
-         return {
-           message: 'Please check your input and try again.',
-           fields,
-           action,
-           issues: validatedFields.error.issues.map((issue) => issue.message),
-         };
-       }
       result = await generateArticleDraft({
-        topic: validatedFields.data.topic,
-        tone: validatedFields.data.tone,
-        wordLimit: 1000, // Hardcoded for now
+        topic: topic,
+        tone: tone,
+        wordLimit: 1000,
       });
       resultKey = 'draft';
     } else if (action === 'grammar') {
-      result = await checkGrammarAndStyle({ text: fields.content as string });
+      result = await checkGrammarAndStyle({ text: content || '' });
       resultKey = 'improvements';
     } else if (action === 'style') {
-        result = await improveStyle({ text: fields.content as string });
+        result = await improveStyle({ text: content || '' });
         resultKey = 'improvedText';
     }
 
