@@ -35,25 +35,33 @@ export const saveDraftHistorySchema = z.object({
     type: z.enum(['Draft', 'Outline', 'Grammar Check', 'Style Improvement', 'Playground'])
 });
 
-const playgroundBaseSchema = z.object({
-  tone: z.string(),
-  purpose: z.string(),
-  action: z.string(),
-});
-
-const topicRequiredSchema = playgroundBaseSchema.extend({
-  topic: z.string().min(5, 'Topic must be at least 5 characters long.'),
-  content: z.string().optional(),
-});
-
-const contentRequiredSchema = playgroundBaseSchema.extend({
-  topic: z.string().optional(),
-  content: z.string().min(20, 'Content must be at least 20 characters long.'),
-});
-
 export const playgroundFormSchema = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('outline') }).merge(topicRequiredSchema),
-  z.object({ action: z.literal('draft') }).merge(topicRequiredSchema),
-  z.object({ action: z.literal('grammar') }).merge(contentRequiredSchema),
-  z.object({ action: z.literal('style') }).merge(contentRequiredSchema),
+  z.object({
+    action: z.literal('outline'),
+    topic: z.string().min(5, 'Topic must be at least 5 characters long.'),
+    tone: z.string(),
+    purpose: z.string(),
+    content: z.string().optional(),
+  }),
+  z.object({
+    action: z.literal('draft'),
+    topic: z.string().min(5, 'Topic must be at least 5 characters long.'),
+    tone: z.string(),
+    purpose: z.string(),
+    content: z.string().optional(),
+  }),
+  z.object({
+    action: z.literal('grammar'),
+    content: z.string().min(20, 'Content must be at least 20 characters long.'),
+    topic: z.string().optional(),
+    tone: z.string(),
+    purpose: z.string(),
+  }),
+  z.object({
+    action: z.literal('style'),
+    content: z.string().min(20, 'Content must be at least 20 characters long.'),
+    topic: z.string().optional(),
+    tone: z.string(),
+    purpose: z.string(),
+  }),
 ]);
