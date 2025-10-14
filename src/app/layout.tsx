@@ -1,20 +1,12 @@
 "use client";
 
-import type { Metadata } from "next";
 import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppShell from "@/components/app-shell";
 import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase";
-
-// Metadata can't be exported from a client component.
-// We can move it to a new server-side layout file if needed,
-// but for this scaffold, we'll comment it out.
-// export const metadata: Metadata = {
-//   title: "LinguaCraft AI",
-//   description: "Multilingual Smart Essay & Article Writer",
-// };
+import LandingLayout from "./landing-layout";
 
 export default function RootLayout({
   children,
@@ -22,12 +14,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const noShellRoutes = ["/login", "/signup"];
-  const showShell = !noShellRoutes.includes(pathname);
+  const publicRoutes = ["/", "/login", "/signup"];
+  const isPublicRoute = publicRoutes.includes(pathname);
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <title>SpellAura AI</title>
+        <meta name="description" content="Your AI-Powered Writing Companion" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -42,7 +36,11 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           <SidebarProvider>
-            {showShell ? <AppShell>{children}</AppShell> : children}
+            {isPublicRoute ? (
+              <LandingLayout>{children}</LandingLayout>
+            ) : (
+              <AppShell>{children}</AppShell>
+            )}
           </SidebarProvider>
         </FirebaseClientProvider>
         <Toaster />

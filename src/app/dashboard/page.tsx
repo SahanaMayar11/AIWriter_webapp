@@ -63,7 +63,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="text-3xl md:text-4xl font-headline font-bold tracking-tight">
-          Welcome back!
+          Welcome back, {user?.displayName}!
         </h1>
         <p className="text-muted-foreground mt-2">
           Ready to craft your next masterpiece? Let&apos;s get writing.
