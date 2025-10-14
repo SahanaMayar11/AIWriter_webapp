@@ -23,10 +23,13 @@ export const grammarCheckFormSchema = z.object({
   text: z.string().min(20, 'Text must be at least 20 characters long.'),
 });
 
+export const improveStyleFormSchema = z.object({
+  text: z.string().min(20, 'Text must be at least 20 characters long.'),
+});
 
 export const saveDraftHistorySchema = z.object({
     topic: z.string(),
     content: z.string(),
     language: z.string(),
-    type: z.enum(['Draft', 'Outline', 'Grammar Check'])
+    type: z.enum(['Draft', 'Outline', 'Grammar Check', 'Style Improvement'])
 });

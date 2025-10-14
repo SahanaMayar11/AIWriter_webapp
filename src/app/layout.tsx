@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>SpellAura AI</title>
+        <title>WriteAI</title>
         <meta name="description" content="Your AI-Powered Writing Companion" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

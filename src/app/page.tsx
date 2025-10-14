@@ -1,11 +1,9 @@
 import Link from 'next/link';
 import {
-  BookOpen,
+  FileText,
+  PenSquare,
   WandSparkles,
-  Languages,
-  Zap,
-  History,
-  ShieldCheck,
+  CheckSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,38 +12,28 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 const features = [
   {
-    icon: BookOpen,
-    title: 'Smart Outlines',
-    description: 'Generate structured outlines for essays and articles instantly.',
+    icon: FileText,
+    title: 'Generate Outlines',
+    description: 'Get structured outlines for your essays and articles instantly. Organize your thoughts before you write.',
+  },
+  {
+    icon: PenSquare,
+    title: 'Create Drafts',
+    description: 'Generate complete drafts based on your topic and requirements. Save hours of writing time.',
+  },
+  {
+    icon: CheckSquare,
+    title: 'Check Grammar',
+    description: 'Catch grammar mistakes, spelling errors, and punctuation issues with advanced AI checking.',
   },
   {
     icon: WandSparkles,
-    title: 'AI Draft Generator',
-    description: 'Create complete drafts based on your topic and preferred tone.',
-  },
-  {
-    icon: Languages,
-    title: 'Multilingual Support',
-    description:
-      'Write in English, Hindi, Tamil, Telugu, and more Indian languages.',
-  },
-  {
-    icon: Zap,
-    title: 'Grammar & Style',
-    description: 'Real-time grammar checking and style improvement suggestions.',
-  },
-  {
-    icon: History,
-    title: 'Draft History',
-    description: 'Access all your previous drafts and outlines anytime.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Secure & Private',
-    description: 'Your data is encrypted and never shared with third parties.',
+    title: 'Improve Style',
+    description: 'Enhance your writing style, tone, and clarity. Make your content more engaging and professional.',
   },
 ];
 
@@ -55,20 +43,24 @@ export default function Home() {
       <main className="flex-1">
         <section className="w-full py-20 md:py-32 lg:py-40">
           <div className="container px-4 md:px-6 text-center">
-            <div className="max-w-3xl mx-auto space-y-4">
+            <div className="max-w-3xl mx-auto space-y-6">
+                <Badge variant="outline" className="py-1 px-3">
+                    <WandSparkles className="h-4 w-4 mr-2 text-primary"/>
+                    Powered by Advanced AI
+                </Badge>
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
-                Your AI-Powered Writing Companion
+                Write Better Essays & Articles with AI Assistance
               </h1>
               <p className="text-lg text-muted-foreground md:text-xl">
-                Write essays, articles, and research papers with intelligent AI
-                assistance. Support for English and major Indian languages.
+                Generate outlines, create drafts, check grammar, and improve your writing style. 
+                Your intelligent writing companion that understands your tone and purpose.
               </p>
               <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
                 <Button asChild size="lg">
-                  <Link href="/signup">Start Writing Free</Link>
+                  <Link href="/signup">Start Writing Now</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link href="#">View Demo</Link>
+                  <Link href="#features">Explore Features</Link>
                 </Button>
               </div>
             </div>
@@ -80,21 +72,22 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
-                  Powerful Features
+                  Everything You Need to Write Better
                 </h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                    Powerful AI features designed to enhance your writing process from start to finish.
+                </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:grid-cols-3 lg:gap-12 mt-12">
+            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-12 mt-12">
               {features.map((feature, index) => (
-                <Card key={index} className="shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="flex flex-row items-center gap-4">
-                    <feature.icon className="w-8 h-8 text-primary" />
-                    <CardTitle className="font-headline text-xl">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
+                <div key={index} className="grid gap-1">
+                    <div className='flex items-center gap-2'>
+                        <feature.icon className="w-6 h-6 text-primary" />
+                        <h3 className="text-lg font-bold font-headline">{feature.title}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </div>
               ))}
             </div>
           </div>

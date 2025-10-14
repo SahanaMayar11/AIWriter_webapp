@@ -11,6 +11,7 @@ import {
   SpellCheck,
   ChevronDown,
   WandSparkles,
+  CheckSquare,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import {
@@ -37,7 +38,8 @@ const navItems = [
 const featureItems = [
   { href: '/outline', icon: FileText, label: 'New Outline' },
   { href: '/draft', icon: PenSquare, label: 'New Draft' },
-  { href: '/grammar-check', icon: SpellCheck, label: 'Grammar Check' },
+  { href: '/grammar-check', icon: CheckSquare, label: 'Grammar Check' },
+  { href: '/improve-style', icon: WandSparkles, label: 'Improve Style' },
 ];
 
 export default function MainNav() {
@@ -50,7 +52,7 @@ export default function MainNav() {
         <div className="flex items-center gap-2">
           <Icons.logo className="size-7 text-primary" />
           <span className="text-lg font-semibold text-sidebar-foreground font-headline">
-            SpellAura AI
+            WriteAI
           </span>
         </div>
       </SidebarHeader>
@@ -75,9 +77,9 @@ export default function MainNav() {
                   isActive={featureItems.some((item) => pathname.startsWith(item.href))}
                   icon={<WandSparkles />}
                   className="w-full justify-between"
-                  suffixIcon={<ChevronDown className='transform transition-transform duration-200 data-[state=open]:rotate-180'/>}
                 >
                   Features
+                  <ChevronDown className='transform transition-transform duration-200 data-[state=open]:rotate-180' />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
             </SidebarMenuItem>
