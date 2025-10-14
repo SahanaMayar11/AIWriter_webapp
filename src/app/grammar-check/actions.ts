@@ -6,9 +6,8 @@ import {
 } from '@/ai/flows/check-grammar-and-style';
 import { grammarCheckFormSchema, saveDraftHistorySchema } from '@/lib/schemas';
 import type { z } from 'zod';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, serverTimestamp, setDoc, getFirestore } from 'firebase/firestore';
 import { getAuthenticatedUser } from '@/lib/auth';
-import { getSdks } from '@/firebase';
 import { initializeApp, getApps } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
 
@@ -72,7 +71,7 @@ export async function saveGrammarAction(
         if (getApps().length === 0) {
             initializeApp(firebaseConfig);
         }
-        const { firestore } = getSdks(getApps()[0]);
+        const firestore = getFirestore();
         const docRef = doc(firestore, 'users', user.uid, 'draftHistories', Date.now().toString());
     
         await setDoc(docRef, {

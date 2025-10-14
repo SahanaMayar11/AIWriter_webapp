@@ -6,12 +6,11 @@ import {
 } from '@/ai/flows/generate-article-draft';
 import { draftFormSchema, saveDraftHistorySchema } from '@/lib/schemas';
 import type { z } from 'zod';
-import { doc, serverTimestamp } from 'firebase/firestore';
-import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { doc, serverTimestamp, getFirestore } from 'firebase/firestore';
 import { getAuthenticatedUser } from '@/lib/auth';
-import { getSdks } from '@/firebase';
-import { initializeApp, getApps } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
+import { setDoc } from 'firebase/firestore';
 
 type FormState = {
   message: string;
@@ -75,7 +74,7 @@ export async function saveDraftAction(
         if (getApps().length === 0) {
             initializeApp(firebaseConfig);
         }
-        const { firestore } = getSdks(getApps()[0]);
+        const firestore = getFirestore();
         const docRef = doc(firestore, 'users', user.uid, 'draftHistories', Date.now().toString());
     
         await setDoc(docRef, {
