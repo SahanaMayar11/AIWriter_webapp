@@ -102,7 +102,7 @@ export default function SignupPage() {
             Create an Account
           </CardTitle>
           <CardDescription>
-            Enter your information to get started with WriteAI
+            Enter your information to get started with SpellAura AI
           </CardDescription>
         </CardHeader>
         <CardContent>

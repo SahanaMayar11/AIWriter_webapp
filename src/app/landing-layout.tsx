@@ -15,7 +15,7 @@ export default function LandingLayout({
       <header className="px-4 lg:px-6 h-14 flex items-center bg-background fixed top-0 left-0 right-0 z-50 border-b">
         <Link href="/" className="flex items-center justify-center">
           <Icons.logo className="h-6 w-6 text-primary" />
-          <span className="ml-2 text-lg font-semibold font-headline">WriteAI</span>
+          <span className="ml-2 text-lg font-semibold font-headline">SpellAura AI</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Home</Link>
@@ -37,7 +37,7 @@ export default function LandingLayout({
             <div className="space-y-4 md:col-span-2">
               <Link href="/" className="flex items-center">
                 <Icons.logo className="h-7 w-7 text-primary" />
-                <span className="ml-2 text-xl font-bold font-headline">WriteAI</span>
+                <span className="ml-2 text-xl font-bold font-headline">SpellAura AI</span>
               </Link>
               <p className="max-w-xs text-muted-foreground text-sm">
                 Your intelligent writing companion. Generate outlines, create drafts, check grammar, and improve your writing style with AI-powered assistance.
@@ -68,7 +68,7 @@ export default function LandingLayout({
             </div>
           </div>
           <div className="mt-8 border-t pt-6 text-center text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} WriteAI. All rights reserved.
+            &copy; {new Date().getFullYear()} SpellAura AI. All rights reserved.
           </div>
         </div>
       </footer>

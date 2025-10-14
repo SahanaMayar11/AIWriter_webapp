@@ -84,7 +84,7 @@ export default function Home() {
                     Powered by Advanced AI
                 </Badge>
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
-                Write Better Essays & Articles with AI Assistance
+                Write Better Essays & Articles with SpellAura AI
               </h1>
               <p className="text-lg text-muted-foreground md:text-xl">
                 Generate outlines, create drafts, check grammar, and improve your writing style. 
@@ -164,7 +164,7 @@ export default function Home() {
                     <div className="space-y-6">
                         <div className="space-y-2">
                             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
-                                Why Choose WriteAI?
+                                Why Choose SpellAura AI?
                             </h2>
                             <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed">
                                 More than just a writing tool - it's your intelligent companion that understands context, tone, and purpose to help you create exceptional content.

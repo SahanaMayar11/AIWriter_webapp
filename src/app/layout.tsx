@@ -14,13 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const publicRoutes = ["/", "/login", "/signup"];
+  const publicRoutes = ["/", "/login", "/signup", "/features"];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>WriteAI</title>
+        <title>SpellAura AI</title>
         <meta name="description" content="Your AI-Powered Writing Companion" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
