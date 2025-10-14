@@ -2,15 +2,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -24,8 +20,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { LANGUAGES, TONES } from '@/lib/constants';
-import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth, deleteDocumentNonBlocking, errorEmitter, FirestorePermissionError } from '@/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth, deleteDocumentNonBlocking } from '@/firebase';
+import { doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -41,13 +37,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-const profileSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  preferredLanguage: z.string(),
-  preferredTone: z.string(),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function SettingsPage() {
   const { user, isUserLoading } = useUser();
@@ -55,7 +44,6 @@ export default function SettingsPage() {
   const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-  const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const userDocRef = useMemoFirebase(() => {
@@ -65,58 +53,6 @@ export default function SettingsPage() {
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc(userDocRef);
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: '',
-      preferredLanguage: 'english',
-      preferredTone: 'casual',
-    },
-  });
-
-  useEffect(() => {
-    if (userProfile) {
-      reset({
-        name: userProfile.name || '',
-        preferredLanguage: userProfile.preferredLanguage || 'english',
-        preferredTone: userProfile.preferredTone || 'casual',
-      });
-    }
-  }, [userProfile, reset]);
-
-  const onSubmit = (data: ProfileFormValues) => {
-    if (!userDocRef) return;
-    setIsSaving(true);
-    
-    const updatedData = {
-      ...data,
-      updatedAt: new Date(),
-    };
-
-    updateDoc(userDocRef, updatedData)
-      .then(() => {
-        toast({
-          title: 'Success',
-          description: 'Your profile has been updated.',
-        });
-      })
-      .catch((serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: userDocRef.path,
-          operation: 'update',
-          requestResourceData: updatedData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => {
-        setIsSaving(false);
-      });
-  };
 
   const handleDeleteAccount = async () => {
     if (!user || !userDocRef || !auth) return;
@@ -157,11 +93,10 @@ export default function SettingsPage() {
     <div className="grid gap-6">
       <div className="grid auto-rows-max gap-6 lg:col-span-2">
         <Card>
-          <form onSubmit={handleSubmit(onSubmit)}>
             <CardHeader>
               <CardTitle className="font-headline">Profile</CardTitle>
               <CardDescription>
-                Update your personal information and preferences.
+                Your personal information and preferences.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -169,16 +104,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="grid gap-2">
                     <Label htmlFor="name">Name</Label>
-                    <Controller
-                      name="name"
-                      control={control}
-                      render={({ field }) => <Input id="name" {...field} />}
-                    />
-                    {errors.name && (
-                      <p className="text-sm text-destructive">
-                        {errors.name.message}
-                      </p>
-                    )}
+                    <Input id="name" value={userProfile?.name || ''} disabled />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -189,61 +115,40 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="grid gap-2">
                     <Label htmlFor="language">Preferred Language</Label>
-                    <Controller
-                      name="preferredLanguage"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger id="language">
-                            <SelectValue placeholder="Select language" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {LANGUAGES.map((lang) => (
-                              <SelectItem key={lang.value} value={lang.value}>
-                                {lang.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
+                    <Select
+                      value={userProfile?.preferredLanguage || 'english'}
+                      disabled
+                    >
+                      <SelectTrigger id="language">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LANGUAGES.map((lang) => (
+                          <SelectItem key={lang.value} value={lang.value}>
+                            {lang.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="tone">Default Tone</Label>
-                     <Controller
-                      name="preferredTone"
-                      control={control}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger id="tone">
-                            <SelectValue placeholder="Select tone" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {TONES.map((tone) => (
-                              <SelectItem key={tone.value} value={tone.value}>
-                                {tone.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
+                     <Select value={userProfile?.preferredTone || 'casual'} disabled>
+                      <SelectTrigger id="tone">
+                        <SelectValue placeholder="Select tone" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TONES.map((tone) => (
+                          <SelectItem key={tone.value} value={tone.value}>
+                            {tone.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-                <Button type="submit" disabled={isSaving}>
-                    {isSaving && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Update Profile
-                </Button>
-            </CardFooter>
-          </form>
         </Card>
 
         <Card>
