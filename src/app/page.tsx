@@ -4,14 +4,13 @@ import {
   PenSquare,
   WandSparkles,
   CheckSquare,
+  Clock,
+  Zap,
+  Target,
+  BookCheck,
+  Package,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 const features = [
@@ -36,6 +35,42 @@ const features = [
     description: 'Enhance your writing style, tone, and clarity. Make your content more engaging and professional.',
   },
 ];
+
+const howItWorks = [
+    {
+        step: 1,
+        title: 'Enter Your Topic',
+        description: 'Start by entering your essay or article topic. Specify your tone, purpose, and any requirements.'
+    },
+    {
+        step: 2,
+        title: 'AI Generates Content',
+        description: 'Our AI analyzes your requirements and generates outlines, drafts, or improvements in real-time.'
+    },
+    {
+        step: 3,
+        title: 'Refine & Export',
+        description: 'Edit your content, save drafts, and export to PDF or Word when you\'re ready to submit.'
+    }
+]
+
+const whyChooseUs = [
+    {
+        icon: Clock,
+        title: 'Save Time',
+        description: 'Generate outlines and drafts in seconds instead of hours. Focus on refining rather than starting from scratch.'
+    },
+    {
+        icon: Target,
+        title: 'Improve Quality',
+        description: 'Enhance your writing with AI-powered suggestions for grammar, style, and clarity.'
+    },
+    {
+        icon: BookCheck,
+        title: 'Stay Organized',
+        description: 'Keep all your drafts and history in one place. Never lose your work with automatic saving.'
+    }
+]
 
 export default function Home() {
   return (
@@ -91,6 +126,89 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </section>
+
+        <section className="w-full py-12 md:py-24 lg:py-32">
+            <div className="container px-4 md:px-6">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center">
+                    <div className="space-y-2">
+                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
+                            How It Works
+                        </h2>
+                        <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                            Simple, powerful workflow to transform your writing.
+                        </p>
+                    </div>
+                </div>
+                <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-3 md:grid-cols-3 lg:gap-12 mt-12">
+                    {howItWorks.map((step) => (
+                        <div key={step.step} className="grid gap-4 relative">
+                            <div className="flex items-center justify-center">
+                                <div className="flex items-center justify-center rounded-full bg-primary/10 text-primary h-12 w-12 text-xl font-bold font-headline">
+                                    {step.step}
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <h3 className="text-lg font-bold font-headline">{step.title}</h3>
+                                <p className="text-sm text-muted-foreground mt-2">{step.description}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
+            <div className="container px-4 md:px-6">
+                <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
+                                Why Choose WriteAI?
+                            </h2>
+                            <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed">
+                                More than just a writing tool - it's your intelligent companion that understands context, tone, and purpose to help you create exceptional content.
+                            </p>
+                        </div>
+                        <ul className="grid gap-4">
+                            {whyChooseUs.map((item) => (
+                                <li key={item.title} className="flex items-start gap-4">
+                                    <div className="bg-primary/10 p-2 rounded-full">
+                                        <item.icon className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold font-headline">{item.title}</h3>
+                                        <p className="text-muted-foreground">{item.description}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="bg-background rounded-lg shadow-lg p-8 space-y-6">
+                        <div className="flex items-center gap-4">
+                            <Zap className="h-8 w-8 text-primary" />
+                            <div>
+                                <p className="text-3xl font-bold font-headline">10x</p>
+                                <p className="text-muted-foreground">Faster Writing</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <CheckSquare className="h-8 w-8 text-primary" />
+                             <div>
+                                <p className="text-3xl font-bold font-headline">95%</p>
+                                <p className="text-muted-foreground">Grammar Accuracy</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <Package className="h-8 w-8 text-primary" />
+                            <div>
+                                <p className="text-3xl font-bold font-headline">1000+</p>
+                                <p className="text-muted-foreground">Essays Generated</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section className="w-full py-12 md:py-24 lg:py-32">
