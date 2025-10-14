@@ -18,6 +18,7 @@ import { checkGrammarAction, type FormState, saveGrammarAction } from './actions
 import { WandSparkles, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
+import { GenerationActions } from '@/components/generation-actions';
 
 const initialState: FormState = {
   message: '',
@@ -123,11 +124,19 @@ export function GrammarCheckForm() {
       </form>
 
       <Card className="shadow-sm h-fit">
-        <CardHeader>
-          <CardTitle className="font-headline">Suggestions</CardTitle>
-          <CardDescription>
-            AI-powered recommendations to improve your writing.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div>
+            <CardTitle className="font-headline">Suggestions</CardTitle>
+            <CardDescription>
+              AI-powered recommendations to improve your writing.
+            </CardDescription>
+          </div>
+          {state.improvements && (
+            <GenerationActions
+              textToCopy={state.improvements}
+              fileName="suggestions.txt"
+            />
+          )}
         </CardHeader>
         <CardContent className="overflow-auto min-h-[320px]">
            <GenerationResult 

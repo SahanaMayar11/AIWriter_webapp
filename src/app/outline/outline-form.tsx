@@ -26,6 +26,7 @@ import { generateOutlineAction, type FormState, saveOutlineAction } from './acti
 import { FileText, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
+import { GenerationActions } from '@/components/generation-actions';
 
 const initialState: FormState = {
   message: '',
@@ -176,11 +177,19 @@ export function OutlineForm() {
       </form>
 
       <Card className="shadow-sm h-fit">
-        <CardHeader>
-          <CardTitle className="font-headline">Generated Outline</CardTitle>
-          <CardDescription>
-            Here is the AI-generated structure for your content.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div>
+            <CardTitle className="font-headline">Generated Outline</CardTitle>
+            <CardDescription>
+              Here is the AI-generated structure for your content.
+            </CardDescription>
+          </div>
+          {state.outline && (
+            <GenerationActions
+              textToCopy={state.outline}
+              fileName={`${state.fields?.topic || 'outline'}.txt`}
+            />
+          )}
         </CardHeader>
         <CardContent className="overflow-auto min-h-[450px]">
           <GenerationResult

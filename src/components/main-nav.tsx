@@ -10,7 +10,6 @@ import {
   Settings,
   SpellCheck,
 } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Icons } from '@/components/icons';
 import {
   Sidebar,
@@ -21,8 +20,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Image from 'next/image';
 import { useUser } from '@/firebase';
 
 const navItems = [
@@ -32,8 +29,6 @@ const navItems = [
   { href: '/grammar-check', icon: SpellCheck, label: 'Grammar Check' },
   { href: '/history', icon: History, label: 'History' },
 ];
-
-const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar');
 
 export default function MainNav() {
   const pathname = usePathname();
@@ -67,29 +62,6 @@ export default function MainNav() {
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
-            {user?.photoURL ? (
-              <Image
-                src={user.photoURL}
-                alt={user.displayName || 'User avatar'}
-                width={36}
-                height={36}
-              />
-            ) : (
-              userAvatar && (
-                <Image
-                  src={userAvatar.imageUrl}
-                  alt={userAvatar.description}
-                  width={36}
-                  height={36}
-                  data-ai-hint={userAvatar.imageHint}
-                />
-              )
-            )}
-            <AvatarFallback>
-              {user?.displayName?.charAt(0) || 'U'}
-            </AvatarFallback>
-          </Avatar>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="font-medium text-sm text-sidebar-foreground">
               {user?.displayName || 'User'}

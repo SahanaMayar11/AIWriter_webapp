@@ -20,21 +20,18 @@ import {
 } from '@/components/ui/select';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LANGUAGES } from '@/lib/constants';
 import { useAuth, useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 
 function capitalize(str: string) {
+  if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export default function PageHeader() {
   const pathname = usePathname();
   const pageName = pathname.split('/').pop() || 'Dashboard';
-  const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar');
   const { user } = useUser();
   const auth = useAuth();
   const router = useRouter();
@@ -75,29 +72,8 @@ export default function PageHeader() {
               size="icon"
               className="overflow-hidden rounded-full"
             >
-              <Avatar>
-                {user?.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    alt={user.displayName || 'User avatar'}
-                    width={36}
-                    height={36}
-                  />
-                ) : (
-                  userAvatar && (
-                    <Image
-                      src={userAvatar.imageUrl}
-                      alt={userAvatar.description}
-                      width={36}
-                      height={36}
-                      data-ai-hint={userAvatar.imageHint}
-                    />
-                  )
-                )}
-                <AvatarFallback>
-                  {user?.displayName?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
+              <User className="h-5 w-5" />
+               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

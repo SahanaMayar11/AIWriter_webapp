@@ -27,11 +27,11 @@ import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { TONES } from '@/lib/constants';
 import { generateDraftAction, type FormState, saveDraftAction } from './actions';
-import { Skeleton } from '@/components/ui/skeleton';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
+import { GenerationActions } from '@/components/generation-actions';
 
 const initialState: FormState = {
   message: '',
@@ -166,11 +166,19 @@ export function DraftForm() {
       </form>
 
       <Card className="shadow-sm h-fit">
-        <CardHeader>
-          <CardTitle className="font-headline">Generated Draft</CardTitle>
-          <CardDescription>
-            Here is the AI-generated draft based on your input.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div>
+            <CardTitle className="font-headline">Generated Draft</CardTitle>
+            <CardDescription>
+              Here is the AI-generated draft based on your input.
+            </CardDescription>
+          </div>
+          {state.draft && (
+            <GenerationActions
+              textToCopy={state.draft}
+              fileName={`${state.fields?.topic || 'draft'}.txt`}
+            />
+          )}
         </CardHeader>
         <CardContent className='min-h-[450px]'>
           <GenerationResult 
