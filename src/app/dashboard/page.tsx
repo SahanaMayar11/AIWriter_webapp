@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/firebase';
+import { writingPrompts } from '@/lib/prompts';
 
 const quickActions = [
   {
@@ -49,6 +51,12 @@ const quickActions = [
 
 export default function DashboardPage() {
   const { user } = useUser();
+  const [prompt, setPrompt] = useState('');
+
+  useEffect(() => {
+    // Select a random prompt on the client side to avoid hydration mismatch
+    setPrompt(writingPrompts[Math.floor(Math.random() * writingPrompts.length)]);
+  }, []);
   
   const getFirstName = () => {
     if (!user?.displayName) return 'there';
@@ -104,14 +112,20 @@ export default function DashboardPage() {
             </CardDescription>
         </CardHeader>
         <CardContent>
-            <blockquote className="border-l-2 pl-6 italic text-lg">
-            &quot;The old lighthouse keeper found a message in a bottle, but it wasn&apos;t from this time.&quot;
-            </blockquote>
-             <Button asChild variant="link" className="px-0 mt-4">
-                <Link href="/playground?prompt=The old lighthouse keeper found a message in a bottle, but it wasn't from this time.">
-                  Start Writing <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+            {prompt ? (
+              <>
+                <blockquote className="border-l-2 pl-6 italic text-lg">
+                  &quot;{prompt}&quot;
+                </blockquote>
+                <Button asChild variant="link" className="px-0 mt-4">
+                  <Link href={`/playground?prompt=${encodeURIComponent(prompt)}`}>
+                    Start Writing <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <div className="h-10 animate-pulse bg-muted rounded-md" />
+            )}
         </CardContent>
       </Card>
     </div>
