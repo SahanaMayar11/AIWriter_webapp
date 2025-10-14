@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Github, Twitter } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 
@@ -30,24 +31,46 @@ export default function LandingLayout({
         </nav>
       </header>
       <main className="flex-1 pt-14">{children}</main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} WriteAI. All rights reserved.
-        </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link
-            href="#"
-            className="text-xs hover:underline underline-offset-4"
-          >
-            Terms of Service
-          </Link>
-          <Link
-            href="#"
-            className="text-xs hover:underline underline-offset-4"
-          >
-            Privacy
-          </Link>
-        </nav>
+      <footer className="border-t">
+        <div className="container mx-auto py-12 px-4 md:px-6">
+          <div className="grid gap-8 md:grid-cols-4">
+            <div className="space-y-4 md:col-span-2">
+              <Link href="/" className="flex items-center">
+                <Icons.logo className="h-7 w-7 text-primary" />
+                <span className="ml-2 text-xl font-bold font-headline">WriteAI</span>
+              </Link>
+              <p className="max-w-xs text-muted-foreground text-sm">
+                Your intelligent writing companion. Generate outlines, create drafts, check grammar, and improve your writing style with AI-powered assistance.
+              </p>
+              <div className="flex space-x-4">
+                <Link href="#" className='text-muted-foreground hover:text-foreground'>
+                  <Twitter className="h-5 w-5" />
+                </Link>
+                <Link href="#" className='text-muted-foreground hover:text-foreground'>
+                  <Github className="h-5 w-5" />
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold tracking-wide">Product</h3>
+              <ul className="mt-4 space-y-2">
+                <li><Link href="/features" className="text-sm text-muted-foreground hover:text-foreground">Features</Link></li>
+                <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Playground</Link></li>
+                <li><Link href="/draft" className="text-sm text-muted-foreground hover:text-foreground">Drafts</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold tracking-wide">Company</h3>
+              <ul className="mt-4 space-y-2">
+                <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">About</Link></li>
+                <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Contact</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 border-t pt-6 text-center text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} WriteAI. All rights reserved.
+          </div>
+        </div>
       </footer>
     </div>
   );

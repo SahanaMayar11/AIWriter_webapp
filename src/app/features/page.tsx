@@ -1,4 +1,6 @@
-import { FileText, PenSquare, SpellCheck, WandSparkles, CheckCircle2 } from 'lucide-react';
+import { FileText, PenSquare, SpellCheck, WandSparkles, CheckCircle2, File, History, Download } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const features = [
   {
@@ -103,6 +105,24 @@ const features = [
   },
 ];
 
+const moreFeatures = [
+    {
+        icon: File,
+        title: 'Draft Management',
+        description: 'Save, organize, and manage all your drafts in one place. Export to PDF, Word, or copy to clipboard.'
+    },
+    {
+        icon: History,
+        title: 'History Tracking',
+        description: 'Keep track of all your AI interactions. Review past suggestions and improvements to learn and grow.'
+    },
+    {
+        icon: Download,
+        title: 'Easy Export',
+        description: 'Export your content in multiple formats including TXT, PDF, and Word. Copy to clipboard with one click.'
+    }
+];
+
 export default function FeaturesPage() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -154,6 +174,53 @@ export default function FeaturesPage() {
             </section>
           ))}
         </div>
+
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
+                    More Features
+                </h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                    Additional tools to enhance your writing workflow
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:grid-cols-3 lg:gap-12 mt-12">
+              {moreFeatures.map((feature, index) => (
+                <div key={index} className="grid gap-4 p-6 rounded-lg border bg-card">
+                    <div className='bg-primary/10 text-primary rounded-lg p-3 w-fit'>
+                        <feature.icon className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-bold font-headline">{feature.title}</h3>
+                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    </div>
+              </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="w-full py-20 md:py-28 lg:py-32">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="rounded-lg bg-background p-8 md:p-12 text-center">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
+                Ready to Experience These Features?
+              </h2>
+              <p className="mt-4 max-w-xl mx-auto text-muted-foreground">
+                Start using WriteAI today and transform your writing process
+              </p>
+              <div className="mt-6">
+                <Button asChild size="lg">
+                  <Link href="/signup">Try It Now</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   );
