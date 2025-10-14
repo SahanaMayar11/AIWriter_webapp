@@ -8,17 +8,10 @@ import {
   LayoutDashboard,
   PenSquare,
   Settings,
-  SpellCheck,
-  ChevronDown,
   WandSparkles,
   CheckSquare,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -33,9 +26,6 @@ import { useUser } from '@/firebase';
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/history', icon: History, label: 'History' },
-];
-
-const featureItems = [
   { href: '/outline', icon: FileText, label: 'New Outline' },
   { href: '/draft', icon: PenSquare, label: 'New Draft' },
   { href: '/grammar-check', icon: CheckSquare, label: 'Grammar Check' },
@@ -70,38 +60,6 @@ export default function MainNav() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
-          <Collapsible defaultOpen>
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton
-                  isActive={featureItems.some((item) => pathname.startsWith(item.href))}
-                  icon={<WandSparkles />}
-                  className="w-full justify-between"
-                >
-                  Features
-                  <ChevronDown className='transform transition-transform duration-200 data-[state=open]:rotate-180' />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-            </SidebarMenuItem>
-            <CollapsibleContent>
-              <SidebarMenu className="ml-4 border-l pl-4 py-2">
-                {featureItems.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.href}
-                      icon={<item.icon />}
-                      tooltip={item.label}
-                      variant="ghost"
-                      className="w-full justify-start"
-                    >
-                      <Link href={item.href}>{item.label}</Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </CollapsibleContent>
-          </Collapsible>
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
