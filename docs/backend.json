@@ -4,7 +4,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the LinguaCraft AI application.",
+      "description": "Represents a user of the SpellAura AI application.",
       "properties": {
         "id": {
           "type": "string",
@@ -94,7 +94,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Admin",
       "type": "object",
-      "description": "Represents an administrator of the LinguaCraft AI application.",
+      "description": "Represents an administrator of the SpellAura AI application.",
       "properties": {
         "id": {
           "type": "string",
@@ -132,7 +132,8 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com"
     ]
   },
   "firestore": {

@@ -19,6 +19,8 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   type Auth,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 import type { FirebaseError } from 'firebase/app';
 
@@ -36,6 +38,11 @@ async function initiateEmailSignUp(
   if (userCredential.user) {
     await updateProfile(userCredential.user, { displayName: name });
   }
+}
+
+function initiateGoogleSignIn(auth: Auth): Promise<void> {
+    const provider = new GoogleAuthProvider();
+    return signInWithPopup(auth, provider).then(() => {});
 }
 
 export default function SignupPage() {
@@ -71,9 +78,17 @@ export default function SignupPage() {
       }
     );
   };
+  
+  const handleGoogleSignUp = async () => {
+    setError(null);
+    if (!auth) return;
+    initiateGoogleSignIn(auth).catch((err: FirebaseError) => {
+      setError(err.message);
+    });
+  };
 
   if (isUserLoading || user) {
-    return <div>Loading...</div>;
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
 
   return (
@@ -87,52 +102,54 @@ export default function SignupPage() {
             Create an Account
           </CardTitle>
           <CardDescription>
-            Enter your information to get started with LinguaCraft AI
+            Enter your information to get started with SpellAura AI
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignUp} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                placeholder="Max Robinson"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {error && (
-              <p className="text-sm text-destructive text-center">{error}</p>
-            )}
-            <Button type="submit" className="w-full">
-              Create an account
+          <div className="grid gap-4">
+            <form onSubmit={handleSignUp} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Max Robinson"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-destructive text-center">{error}</p>
+              )}
+              <Button type="submit" className="w-full">
+                Create an account
+              </Button>
+            </form>
+            <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignUp}>
+              Continue with Google
             </Button>
-            <Button variant="outline" className="w-full" type="button">
-              Sign up with Google
-            </Button>
-          </form>
+          </div>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
             <Link href="/login" className="underline">

@@ -9,8 +9,14 @@ import {
   PenSquare,
   Settings,
   SpellCheck,
+  ChevronDown,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -24,10 +30,13 @@ import { useUser } from '@/firebase';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/history', icon: History, label: 'History' },
+];
+
+const featureItems = [
   { href: '/outline', icon: FileText, label: 'Outline Generator' },
   { href: '/draft', icon: PenSquare, label: 'Draft Generator' },
   { href: '/grammar-check', icon: SpellCheck, label: 'Grammar Check' },
-  { href: '/history', icon: History, label: 'History' },
 ];
 
 export default function MainNav() {
@@ -40,7 +49,7 @@ export default function MainNav() {
         <div className="flex items-center gap-2">
           <Icons.logo className="size-7 text-primary" />
           <span className="text-lg font-semibold text-sidebar-foreground font-headline">
-            LinguaCraft AI
+            SpellAura AI
           </span>
         </div>
       </SidebarHeader>
@@ -58,6 +67,37 @@ export default function MainNav() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          <Collapsible>
+            <SidebarMenuItem>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                  isActive={featureItems.some((item) => pathname.startsWith(item.href))}
+                  icon={<ChevronDown className='transform transition-transform duration-200 data-[state=open]:rotate-180'/>}
+                  className="w-full justify-start"
+                >
+                  Features
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+            </SidebarMenuItem>
+            <CollapsibleContent>
+              <SidebarMenu className="ml-4 border-l pl-4 py-2">
+                {featureItems.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
+                      icon={<item.icon />}
+                      tooltip={item.label}
+                      variant="ghost"
+                      className="w-full justify-start"
+                    >
+                      <Link href={item.href}>{item.label}</Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </CollapsibleContent>
+          </Collapsible>
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>

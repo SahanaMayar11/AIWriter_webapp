@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import { useAuth, useUser } from '@/firebase';
-import { signInWithEmailAndPassword, type Auth } from 'firebase/auth';
+import { signInWithEmailAndPassword, type Auth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import type { FirebaseError } from 'firebase/app';
 
 function initiateEmailSignIn(
@@ -24,6 +24,11 @@ function initiateEmailSignIn(
   password: string
 ): Promise<void> {
   return signInWithEmailAndPassword(auth, email, password).then(() => {});
+}
+
+function initiateGoogleSignIn(auth: Auth): Promise<void> {
+    const provider = new GoogleAuthProvider();
+    return signInWithPopup(auth, provider).then(() => {});
 }
 
 export default function LoginPage() {
@@ -62,8 +67,16 @@ export default function LoginPage() {
     });
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    if (!auth) return;
+    initiateGoogleSignIn(auth).catch((err: FirebaseError) => {
+      setError(err.message);
+    });
+  };
+
   if (isUserLoading || user) {
-    return <div>Loading...</div>;
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
 
   return (
@@ -79,46 +92,48 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
+          <div className="grid gap-4">
+            <form onSubmit={handleLogin} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {error && (
-              <p className="text-sm text-destructive text-center">{error}</p>
-            )}
-            <Button type="submit" className="w-full">
-              Login
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Link
+                    href="#"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-destructive text-center">{error}</p>
+              )}
+              <Button type="submit" className="w-full">
+                Login
+              </Button>
+            </form>
+            <Button variant="outline" className="w-full" type="button" onClick={handleGoogleLogin}>
+              Continue with Google
             </Button>
-            <Button variant="outline" className="w-full" type="button">
-              Login with Google
-            </Button>
-          </form>
+          </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
             <Link href="/signup" className="underline">

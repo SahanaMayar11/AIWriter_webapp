@@ -104,7 +104,7 @@ export default function HistoryPage() {
                     {item.language}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
-                    {new Date(item.createdAt).toLocaleDateString()}
+                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
