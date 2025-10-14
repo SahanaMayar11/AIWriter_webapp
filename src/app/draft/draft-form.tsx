@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useActionState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Alert,
   AlertDescription,
@@ -23,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { TONES } from '@/lib/constants';
@@ -47,16 +47,27 @@ const initialState: FormState = {
   message: '',
 };
 
-export function DraftForm() {
+function DraftFormContent() {
   const [state, formAction] = useActionState(generateDraftAction, initialState);
   const { toast } = useToast();
   const { user } = useUser();
   const firestore = useFirestore();
+  const searchParams = useSearchParams();
+  const formRef = useRef<HTMLFormElement>(null);
   
-  const [topic, setTopic] = useState(state.fields?.topic || '');
-  const [tone, setTone] = useState(state.fields?.tone || 'academic');
-  const [wordLimit, setWordLimit] = useState(state.fields?.wordLimit || '1000');
+  const [topic, setTopic] = useState(state.fields?.topic || searchParams.get('topic') || '');
+  const [tone, setTone] = useState(state.fields?.tone || searchParams.get('tone') || 'academic');
+  const [wordLimit, setWordLimit] = useState(state.fields?.wordLimit || searchParams.get('wordLimit') || '1000');
+  const [outline, setOutline] = useState(searchParams.get('outline') || '');
 
+  useEffect(() => {
+    if (searchParams.get('topic') && formRef.current) {
+        // Use a timeout to ensure state has been updated before submitting
+        setTimeout(() => {
+            formRef.current?.requestSubmit();
+        }, 100);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (state.message && state.message !== 'success') {
@@ -75,6 +86,7 @@ export function DraftForm() {
         setTopic(state.fields.topic || '');
         setTone(state.fields.tone || 'academic');
         setWordLimit(state.fields.wordLimit || '1000');
+        setOutline(state.fields.outline || '');
       }
     }
   }, [state, toast]);
@@ -123,7 +135,7 @@ export function DraftForm() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <form action={formAction}>
+      <form action={formAction} ref={formRef}>
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="font-headline">Draft Details</CardTitle>
@@ -185,6 +197,9 @@ export function DraftForm() {
                 />
               </div>
             </div>
+            {outline && (
+              <input type="hidden" name="outline" value={outline} />
+            )}
             <SubmitButton className="w-full">Generate Draft</SubmitButton>
           </CardContent>
         </Card>
@@ -225,3 +240,12 @@ export function DraftForm() {
     </div>
   );
 }
+
+
+export function DraftForm() {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <DraftFormContent />
+      </Suspense>
+    );
+  }

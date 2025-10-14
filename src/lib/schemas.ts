@@ -7,6 +7,7 @@ export const draftFormSchema = z.object({
     .number()
     .min(50, 'Word limit must be at least 50.')
     .max(2000, 'Word limit cannot exceed 2000.'),
+  outline: z.string().optional(),
 });
 
 export const outlineFormSchema = z.object({

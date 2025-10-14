@@ -15,6 +15,7 @@ const GenerateArticleDraftInputSchema = z.object({
   topic: z.string().describe('The topic of the article.'),
   tone: z.string().describe('The tone of the article (e.g., academic, casual, formal, persuasive).'),
   wordLimit: z.number().describe('The desired word limit for the article.'),
+  outline: z.string().optional().describe('An optional outline to structure the article.'),
 });
 
 export type GenerateArticleDraftInput = z.infer<typeof GenerateArticleDraftInputSchema>;
@@ -36,6 +37,10 @@ const generateArticleDraftPrompt = ai.definePrompt({
   prompt: `You are an AI writing assistant that helps users generate article drafts.
 
   Based on the user's input, generate an article draft with the specified topic, tone, and word limit.
+  {{#if outline}}
+  Use the following outline to structure the article:
+  {{{outline}}}
+  {{/if}}
 
   Use simple markdown for formatting, like headings (#, ##) and paragraphs.
 

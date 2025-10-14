@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useActionState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
@@ -24,7 +25,7 @@ import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { LANGUAGES, TONES } from '@/lib/constants';
 import { generateOutlineAction } from './actions';
-import { FileText, Terminal } from 'lucide-react';
+import { FileText, Terminal, PenSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
@@ -47,6 +48,7 @@ export function OutlineForm() {
   const { toast } = useToast();
   const { user } = useUser();
   const firestore = useFirestore();
+  const router = useRouter();
 
   const [topic, setTopic] = useState(state.fields?.topic || '');
   const [tone, setTone] = useState(state.fields?.tone || 'academic');
@@ -115,6 +117,24 @@ export function OutlineForm() {
             description: error instanceof Error ? error.message : 'An unknown error occurred.',
         });
     }
+  };
+
+  const handleGenerateDraft = () => {
+    if (!state.outline || !state.fields) {
+      toast({
+        variant: 'destructive',
+        title: 'Nothing to generate from',
+        description: 'Please generate an outline first.',
+      });
+      return;
+    }
+    const params = new URLSearchParams({
+      topic: state.fields.topic || '',
+      tone: state.fields.tone || '',
+      wordLimit: state.fields.wordLimit || '',
+      outline: state.outline,
+    });
+    router.push(`/draft?${params.toString()}`);
   };
 
   return (
@@ -228,8 +248,12 @@ export function OutlineForm() {
           />
         </CardContent>
          {state.outline && (
-            <CardActions className="p-6 pt-0">
+            <CardActions className="p-6 pt-0 space-x-2">
               <Button onClick={handleSave}>Save Outline</Button>
+              <Button variant="secondary" onClick={handleGenerateDraft}>
+                <PenSquare className="mr-2 h-4 w-4" />
+                Generate Draft
+              </Button>
             </CardActions>
           )}
       </Card>
