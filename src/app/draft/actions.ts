@@ -12,7 +12,14 @@ import { getAuthenticatedUser } from '@/lib/auth';
 import { getSdks } from '@/firebase';
 import { initializeApp, getApps } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
-import { FormState } from './draft-form';
+
+type FormState = {
+  message: string;
+  draft?: string;
+  fields?: Record<string, string>;
+  issues?: string[];
+};
+
 
 export async function generateDraftAction(
   prevState: FormState,
@@ -76,6 +83,7 @@ export async function saveDraftAction(
             userId: user.uid,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
+            type: 'Draft',
         }, { merge: true });
     
         return { message: 'success' };

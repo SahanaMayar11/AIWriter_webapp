@@ -12,7 +12,13 @@ import { getAuthenticatedUser } from '@/lib/auth';
 import { getSdks } from '@/firebase';
 import { initializeApp, getApps } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
-import { FormState } from './grammar-check-form';
+
+type FormState = {
+  message: string;
+  improvements?: string;
+  fields?: Record<string, string>;
+  issues?: string[];
+};
 
 export async function checkGrammarAction(
   prevState: FormState,

@@ -12,7 +12,13 @@ import { getAuthenticatedUser } from '@/lib/auth';
 import { getSdks } from '@/firebase';
 import { initializeApp, getApps } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
-import { FormState } from './outline-form';
+
+type FormState = {
+  message: string;
+  outline?: string;
+  fields?: Record<string, string>;
+  issues?: string[];
+};
 
 export async function generateOutlineAction(
   prevState: FormState,
