@@ -1,38 +1,46 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useFormState } from "react-dom";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useEffect, useRef, useState } from 'react';
+import { useFormState } from 'react-dom';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
+  CardActions,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { SubmitButton } from "@/components/submit-button";
-import { useToast } from "@/hooks/use-toast";
-import { TONES } from "@/lib/constants";
-import { generateDraftAction, type FormState } from "./actions";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useFormStatus } from "react-dom";
-import { PenSquare, Terminal } from "lucide-react";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { SubmitButton } from '@/components/submit-button';
+import { useToast } from '@/hooks/use-toast';
+import { TONES } from '@/lib/constants';
+import { generateDraftAction, type FormState, saveDraftAction } from './actions';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useFormStatus } from 'react-dom';
+import { PenSquare, Terminal } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 const initialState: FormState = {
-  message: "",
+  message: '',
 };
 
-function GenerationResult({ draft }: { draft: string | undefined }) {
+function GenerationResult({
+  draft,
+  formState,
+}: {
+  draft: string | undefined;
+  formState: FormState;
+}) {
   const { pending } = useFormStatus();
 
   if (pending) {
@@ -60,35 +68,76 @@ function GenerationResult({ draft }: { draft: string | undefined }) {
       </div>
     );
   }
-  
-  return <Textarea readOnly value={draft} className="min-h-[400px] text-base" />;
+
+  return (
+    <>
+      <Textarea readOnly value={draft} className="min-h-[400px] text-base" />
+    </>
+  );
 }
 
 export function DraftForm() {
   const [state, formAction] = useFormState(generateDraftAction, initialState);
   const { toast } = useToast();
-  const formRef = useRef<HTMLFormElement>(null);
+  
+  const [topic, setTopic] = useState(state.fields?.topic || '');
+  const [tone, setTone] = useState(state.fields?.tone || 'academic');
+  const [wordLimit, setWordLimit] = useState(state.fields?.wordLimit || '1000');
+
 
   useEffect(() => {
-    if (state.message && state.message !== "success") {
+    if (state.message && state.message !== 'success') {
       toast({
-        variant: "destructive",
-        title: "Error",
+        variant: 'destructive',
+        title: 'Error',
         description: state.message,
       });
     }
-    if (state.message === "success") {
+    if (state.message === 'success') {
       toast({
-        title: "Success!",
-        description: "Your draft has been generated.",
+        title: 'Success!',
+        description: 'Your draft has been generated.',
       });
-      formRef.current?.reset();
+       if (state.fields) {
+        setTopic(state.fields.topic || '');
+        setTone(state.fields.tone || 'academic');
+        setWordLimit(state.fields.wordLimit || '1000');
+      }
     }
   }, [state, toast]);
 
+  const handleSave = async () => {
+    if (!state.draft || !state.fields) {
+      toast({
+        variant: 'destructive',
+        title: 'Nothing to save',
+        description: 'Please generate a draft first.',
+      });
+      return;
+    }
+    const result = await saveDraftAction({
+      topic: state.fields.topic || '',
+      content: state.draft,
+      language: 'English',
+      type: 'Draft',
+    });
+    if (result.message === 'success') {
+      toast({
+        title: 'Saved!',
+        description: 'Your draft has been saved to your history.',
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: result.message,
+      });
+    }
+  };
+
   return (
-    <form ref={formRef} action={formAction}>
-      <div className="grid gap-8 lg:grid-cols-2">
+    <div className="grid gap-8 lg:grid-cols-2">
+      <form action={formAction}>
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="font-headline">Draft Details</CardTitle>
@@ -117,12 +166,14 @@ export function DraftForm() {
                 name="topic"
                 placeholder="e.g., The Future of Artificial Intelligence"
                 required
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="tone">Tone</Label>
-                <Select name="tone" defaultValue="academic">
+                <Select name="tone" value={tone} onValueChange={setTone}>
                   <SelectTrigger id="tone">
                     <SelectValue placeholder="Select tone" />
                   </SelectTrigger>
@@ -142,7 +193,8 @@ export function DraftForm() {
                   name="wordLimit"
                   type="number"
                   placeholder="e.g., 1000"
-                  defaultValue="1000"
+                  value={wordLimit}
+                  onChange={(e) => setWordLimit(e.target.value)}
                   required
                 />
               </div>
@@ -150,19 +202,24 @@ export function DraftForm() {
             <SubmitButton className="w-full">Generate Draft</SubmitButton>
           </CardContent>
         </Card>
+      </form>
 
-        <Card className="shadow-sm h-[560px]">
-          <CardHeader>
-            <CardTitle className="font-headline">Generated Draft</CardTitle>
-            <CardDescription>
-              Here is the AI-generated draft based on your input.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <GenerationResult draft={state.draft} />
-          </CardContent>
-        </Card>
-      </div>
-    </form>
+      <Card className="shadow-sm h-fit">
+        <CardHeader>
+          <CardTitle className="font-headline">Generated Draft</CardTitle>
+          <CardDescription>
+            Here is the AI-generated draft based on your input.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className='min-h-[450px]'>
+          <GenerationResult draft={state.draft} formState={state} />
+        </CardContent>
+        {state.draft && (
+            <CardActions className='p-6 pt-0'>
+              <Button onClick={handleSave}>Save Draft</Button>
+            </CardActions>
+        )}
+      </Card>
+    </div>
   );
 }

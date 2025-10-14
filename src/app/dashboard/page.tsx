@@ -1,13 +1,15 @@
-import Link from "next/link";
-import { ArrowRight, FileText, PenSquare, SpellCheck } from "lucide-react";
+'use client';
+
+import Link from 'next/link';
+import { ArrowRight, FileText, PenSquare, SpellCheck } from 'lucide-react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -15,68 +17,53 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import type { HistoryItem } from "@/lib/types";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import type { DraftHistory } from '@/lib/types';
+import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 const quickActions = [
   {
-    title: "New Outline",
-    description: "Generate a structured outline for your essay or article.",
-    href: "/outline",
+    title: 'New Outline',
+    description: 'Generate a structured outline for your essay or article.',
+    href: '/outline',
     icon: FileText,
   },
   {
-    title: "New Draft",
-    description: "Create a complete draft based on your topic and tone.",
-    href: "/draft",
+    title: 'New Draft',
+    description: 'Create a complete draft based on your topic and tone.',
+    href: '/draft',
     icon: PenSquare,
   },
   {
-    title: "Grammar Check",
-    description: "Proofread and enhance your existing text.",
-    href: "/grammar-check",
+    title: 'Grammar Check',
+    description: 'Proofread and enhance your existing text.',
+    href: '/grammar-check',
     icon: SpellCheck,
   },
 ];
 
-const recentHistory: HistoryItem[] = [
-  {
-    id: "1",
-    topic: "The Future of Renewable Energy",
-    type: "Outline",
-    language: "English",
-    date: "2024-05-20",
-  },
-  {
-    id: "2",
-    topic: "A History of Indian Cinema",
-    type: "Draft",
-    language: "Hindi",
-    date: "2024-05-19",
-  },
-  {
-    id: "3",
-    topic: "The Impact of AI on Society",
-    type: "Draft",
-    language: "English",
-    date: "2024-05-18",
-  },
-  {
-    id: "4",
-    topic: "Benefits of a Healthy Diet",
-    type: "Outline",
-    language: "Tamil",
-    date: "2024-05-17",
-  },
-];
-
 export default function DashboardPage() {
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const recentHistoryQuery = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'draftHistories'),
+      orderBy('createdAt', 'desc'),
+      limit(4)
+    );
+  }, [user, firestore]);
+  
+  const { data: recentHistory, isLoading } = useCollection<DraftHistory>(recentHistoryQuery);
+
   return (
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="text-3xl md:text-4xl font-headline font-bold tracking-tight">
-          Welcome back, User!
+          Welcome back!
         </h1>
         <p className="text-muted-foreground mt-2">
           Ready to craft your next masterpiece? Let&apos;s get writing.
@@ -134,7 +121,14 @@ export default function DashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentHistory.map((item) => (
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
+              {recentHistory && recentHistory.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.topic}</TableCell>
                   <TableCell className="hidden sm:table-cell">
@@ -146,10 +140,17 @@ export default function DashboardPage() {
                     {item.language}
                   </TableCell>
                   <TableCell className="text-right text-muted-foreground">
-                    {item.date}
+                    {new Date(item.createdAt).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))}
+               {recentHistory?.length === 0 && !isLoading && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    No recent activity.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
