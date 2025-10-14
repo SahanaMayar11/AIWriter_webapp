@@ -57,6 +57,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const userDocRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -101,6 +102,7 @@ export default function SettingsPage() {
         title: 'Success',
         description: 'Your profile has been updated.',
       });
+      setIsEditing(false);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -113,16 +115,23 @@ export default function SettingsPage() {
     }
   };
 
+  const handleCancel = () => {
+    if (userProfile) {
+        reset({
+            name: userProfile.name || '',
+            preferredLanguage: userProfile.preferredLanguage || 'english',
+            preferredTone: userProfile.preferredTone || 'casual',
+        });
+    }
+    setIsEditing(false);
+  }
+
   const handleDeleteAccount = async () => {
     if (!user || !userDocRef || !auth) return;
     setIsDeleting(true);
 
-    // This now uses the non-blocking update with proper error handling
     deleteDocumentNonBlocking(userDocRef);
 
-    // We can assume for now the client-side operation will likely succeed
-    // and proceed with signing the user out. The error emitter will
-    // catch any security rule violations.
     try {
       await auth.signOut();
 
@@ -171,7 +180,7 @@ export default function SettingsPage() {
                     <Controller
                       name="name"
                       control={control}
-                      render={({ field }) => <Input id="name" {...field} />}
+                      render={({ field }) => <Input id="name" {...field} disabled={!isEditing} />}
                     />
                     {errors.name && (
                       <p className="text-sm text-destructive">
@@ -195,6 +204,7 @@ export default function SettingsPage() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
+                          disabled={!isEditing}
                         >
                           <SelectTrigger id="language">
                             <SelectValue placeholder="Select language" />
@@ -216,7 +226,7 @@ export default function SettingsPage() {
                       name="preferredTone"
                       control={control}
                       render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={!isEditing}>
                           <SelectTrigger id="tone">
                             <SelectValue placeholder="Select tone" />
                           </SelectTrigger>
@@ -235,12 +245,21 @@ export default function SettingsPage() {
               </div>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              <Button type="submit" disabled={isSaving}>
-                {isSaving && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Edit
-              </Button>
+              {isEditing ? (
+                  <div className="flex gap-2">
+                    <Button type="submit" disabled={isSaving}>
+                        {isSaving && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Save Changes
+                    </Button>
+                    <Button variant="outline" type="button" onClick={handleCancel}>
+                        Cancel
+                    </Button>
+                  </div>
+              ) : (
+                <Button type="button" onClick={() => setIsEditing(true)}>Edit</Button>
+              )}
             </CardFooter>
           </form>
         </Card>
