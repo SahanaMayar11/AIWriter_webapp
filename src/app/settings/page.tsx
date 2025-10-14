@@ -131,7 +131,7 @@ export default function SettingsPage() {
         description: 'Your account data will be deleted. You have been signed out.',
       });
 
-      router.push('/signup');
+      router.push('/');
     } catch (error) {
        toast({
         variant: 'destructive',
