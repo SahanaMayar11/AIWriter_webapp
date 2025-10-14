@@ -26,12 +26,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { TONES } from '@/lib/constants';
-import { generateDraftAction, type FormState, saveDraftAction } from './actions';
+import { generateDraftAction, saveDraftAction } from './actions';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
+
+export type FormState = {
+  message: string;
+  draft?: string;
+  fields?: Record<string, string>;
+  issues?: string[];
+};
 
 const initialState: FormState = {
   message: '',

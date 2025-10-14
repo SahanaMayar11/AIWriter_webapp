@@ -12,13 +12,7 @@ import { getAuthenticatedUser } from '@/lib/auth';
 import { getSdks } from '@/firebase';
 import { initializeApp, getApps } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
-
-export type FormState = {
-  message: string;
-  draft?: string;
-  fields?: Record<string, string>;
-  issues?: string[];
-};
+import { FormState } from './draft-form';
 
 export async function generateDraftAction(
   prevState: FormState,

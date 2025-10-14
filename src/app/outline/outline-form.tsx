@@ -22,11 +22,18 @@ import {
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { LANGUAGES, TONES } from '@/lib/constants';
-import { generateOutlineAction, type FormState, saveOutlineAction } from './actions';
+import { generateOutlineAction, saveOutlineAction } from './actions';
 import { FileText, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
+
+export type FormState = {
+  message: string;
+  outline?: string;
+  fields?: Record<string, string>;
+  issues?: string[];
+};
 
 const initialState: FormState = {
   message: '',

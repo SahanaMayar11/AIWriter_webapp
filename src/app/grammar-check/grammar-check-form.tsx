@@ -14,11 +14,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
-import { checkGrammarAction, type FormState, saveGrammarAction } from './actions';
+import { checkGrammarAction, saveGrammarAction } from './actions';
 import { WandSparkles, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
+
+export type FormState = {
+  message: string;
+  improvements?: string;
+  fields?: Record<string, string>;
+  issues?: string[];
+};
 
 const initialState: FormState = {
   message: '',
