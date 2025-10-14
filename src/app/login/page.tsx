@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import { useAuth, useUser, initiateEmailSignIn } from "@/firebase";
+import type { FirebaseError } from 'firebase/app';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,14 +34,23 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    try {
-      initiateEmailSignIn(auth, email, password);
-      // The useUser hook will detect the change and redirect
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred."
-      );
-    }
+    initiateEmailSignIn(auth, email, password)
+      .catch((err: FirebaseError) => {
+        switch (err.code) {
+          case 'auth/wrong-password':
+            setError('Incorrect password. Please try again.');
+            break;
+          case 'auth/user-not-found':
+            setError('No account found with this email address.');
+            break;
+          case 'auth/invalid-credential':
+            setError('Invalid credentials. Please check your email and password.');
+            break;
+          default:
+            setError('An unknown error occurred. Please try again.');
+            break;
+        }
+      });
   };
 
   if (isUserLoading) {

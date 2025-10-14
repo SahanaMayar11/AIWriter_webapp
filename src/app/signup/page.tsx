@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import { useAuth, useUser, initiateEmailSignUp } from "@/firebase";
+import type { FirebaseError } from 'firebase/app';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -34,14 +35,16 @@ export default function SignupPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    try {
-      initiateEmailSignUp(auth, email, password);
-      // The useUser hook will detect the change and redirect
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred."
-      );
-    }
+    initiateEmailSignUp(auth, email, password)
+      .catch((err: FirebaseError) => {
+        if (err.code === 'auth/email-already-in-use') {
+          setError('This email address is already in use.');
+        } else if (err.code === 'auth/weak-password') {
+          setError('The password is too weak. Please use a stronger password.');
+        } else {
+          setError('An unknown error occurred. Please try again.');
+        }
+      });
   };
 
   if (isUserLoading) {
