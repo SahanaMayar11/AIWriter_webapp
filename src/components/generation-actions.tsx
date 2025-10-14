@@ -46,11 +46,7 @@ export function GenerationActions({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" onClick={handleCopy}>
-              {copied ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Clipboard className="h-4 w-4" />
-              )}
+              {copied ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
               <span className="sr-only">Copy to clipboard</span>
             </Button>
           </TooltipTrigger>
