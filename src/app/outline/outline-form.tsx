@@ -150,6 +150,7 @@ export function OutlineForm() {
       tone: state.fields.tone || '',
       wordLimit: state.fields.wordLimit || '',
       outline: state.outline,
+      language: language,
     });
     router.push(`/draft?${params.toString()}`);
   };

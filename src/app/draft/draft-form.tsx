@@ -26,14 +26,14 @@ import {
 } from '@/components/ui/select';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
-import { TONES } from '@/lib/constants';
+import { TONES, LANGUAGES } from '@/lib/constants';
 import { generateDraftAction } from './actions';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser, useAppState } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export type FormState = {
@@ -54,11 +54,17 @@ function DraftFormContent() {
   const firestore = useFirestore();
   const searchParams = useSearchParams();
   const formRef = useRef<HTMLFormElement>(null);
+  const { language: appLanguage } = useAppState();
   
   const [topic, setTopic] = useState(state.fields?.topic || searchParams.get('topic') || '');
   const [tone, setTone] = useState(state.fields?.tone || searchParams.get('tone') || 'academic');
   const [wordLimit, setWordLimit] = useState(state.fields?.wordLimit || searchParams.get('wordLimit') || '1000');
   const [outline, setOutline] = useState(searchParams.get('outline') || '');
+  const [language, setLanguage] = useState(state.fields?.language || searchParams.get('language') || appLanguage);
+
+  useEffect(() => {
+    setLanguage(appLanguage);
+  }, [appLanguage]);
 
   useEffect(() => {
     if (searchParams.get('topic') && formRef.current) {
@@ -87,9 +93,10 @@ function DraftFormContent() {
         setTone(state.fields.tone || 'academic');
         setWordLimit(state.fields.wordLimit || '1000');
         setOutline(state.fields.outline || '');
+        setLanguage(state.fields.language || appLanguage);
       }
     }
-  }, [state, toast]);
+  }, [state, toast, appLanguage]);
 
   const handleSave = async () => {
     if (!state.draft || !state.fields) {
@@ -114,7 +121,7 @@ function DraftFormContent() {
         await addDoc(historyRef, {
             topic: state.fields.topic || '',
             content: state.draft,
-            language: 'English',
+            language: language,
             type: 'Draft',
             userId: user.uid,
             createdAt: serverTimestamp(),
@@ -196,6 +203,25 @@ function DraftFormContent() {
                   required
                 />
               </div>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="language">Language</Label>
+              <Select
+                name="language"
+                value={language}
+                onValueChange={setLanguage}
+              >
+                <SelectTrigger id="language">
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang.value} value={lang.value}>
+                      {lang.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {outline && (
               <input type="hidden" name="outline" value={outline} />
