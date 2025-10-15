@@ -1,14 +1,15 @@
+
 import Link from 'next/link';
 import {
   FileText,
   PenSquare,
   WandSparkles,
   CheckSquare,
-  Clock,
+  BrainCircuit,
   Zap,
-  Target,
   BookCheck,
   Package,
+  Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -63,22 +64,22 @@ const howItWorks = [
 
 const whyChooseUs = [
   {
-    icon: Clock,
-    title: 'Save Time',
+    icon: BrainCircuit,
+    title: 'Contextual Intelligence',
     description:
-      'Generate outlines and drafts in seconds instead of hours. Focus on refining rather than starting from scratch.',
+      'Our AI does more than just write—it understands your purpose and tone, ensuring the generated content aligns perfectly with your goals.',
   },
   {
-    icon: Target,
-    title: 'Improve Quality',
+    icon: Link2,
+    title: 'Seamless Workflow Integration',
     description:
-      'Enhance your writing with AI-powered suggestions for grammar, style, and clarity.',
+      'Move from outline to draft to final polish without switching contexts. Our integrated tools support your entire writing process in one place.',
   },
   {
     icon: BookCheck,
-    title: 'Stay Organized',
+    title: 'Focus on Skill-Building',
     description:
-      'Keep all your drafts and history in one place. Never lose your work with automatic saving.',
+      'We provide explanations and suggestions that help you understand the reasoning behind changes, making you a better writer over time.',
   },
 ];
 
