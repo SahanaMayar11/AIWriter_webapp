@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -20,8 +21,8 @@ export default function LandingLayout({
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Home</Link>
             <Link href="/features" className="text-sm font-medium hover:underline underline-offset-4">Features</Link>
-            <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">About</Link>
-            <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
+            <Link href="/#why-choose-us" className="text-sm font-medium hover:underline underline-offset-4">About</Link>
+            <Link href="#footer" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
           <Button variant="ghost" asChild>
             <Link href="/login">Login</Link>
           </Button>
@@ -31,7 +32,7 @@ export default function LandingLayout({
         </nav>
       </header>
       <main className="flex-1 pt-14">{children}</main>
-      <footer className="border-t">
+      <footer id="footer" className="border-t">
         <div className="container mx-auto py-12 px-4 md:px-6">
           <div className="grid gap-8 md:grid-cols-4">
             <div className="space-y-4 md:col-span-2">
@@ -55,15 +56,15 @@ export default function LandingLayout({
               <h3 className="font-semibold tracking-wide">Product</h3>
               <ul className="mt-4 space-y-2">
                 <li><Link href="/features" className="text-sm text-muted-foreground hover:text-foreground">Features</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Playground</Link></li>
+                <li><Link href="/playground" className="text-sm text-muted-foreground hover:text-foreground">Playground</Link></li>
                 <li><Link href="/draft" className="text-sm text-muted-foreground hover:text-foreground">Drafts</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold tracking-wide">Company</h3>
               <ul className="mt-4 space-y-2">
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">About</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Contact</Link></li>
+                <li><Link href="/#why-choose-us" className="text-sm text-muted-foreground hover:text-foreground">About</Link></li>
+                <li><Link href="#footer" className="text-sm text-muted-foreground hover:text-foreground">Contact</Link></li>
               </ul>
             </div>
           </div>
