@@ -21,8 +21,8 @@ export default function LandingLayout({
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Home</Link>
             <Link href="/features" className="text-sm font-medium hover:underline underline-offset-4">Features</Link>
-            <Link href="/#why-choose-us" className="text-sm font-medium hover:underline underline-offset-4">About</Link>
-            <Link href="#footer" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
+            <a href="/#why-choose-us" className="text-sm font-medium hover:underline underline-offset-4">About</a>
+            <a href="#footer" className="text-sm font-medium hover:underline underline-offset-4">Contact</a>
           <Button variant="ghost" asChild>
             <Link href="/login">Login</Link>
           </Button>
@@ -63,8 +63,8 @@ export default function LandingLayout({
             <div>
               <h3 className="font-semibold tracking-wide">Company</h3>
               <ul className="mt-4 space-y-2">
-                <li><Link href="/#why-choose-us" className="text-sm text-muted-foreground hover:text-foreground">About</Link></li>
-                <li><Link href="#footer" className="text-sm text-muted-foreground hover:text-foreground">Contact</Link></li>
+                <li><a href="/#why-choose-us" className="text-sm text-muted-foreground hover:text-foreground">About</a></li>
+                <li><a href="#footer" className="text-sm text-muted-foreground hover:text-foreground">Contact</a></li>
               </ul>
             </div>
           </div>
