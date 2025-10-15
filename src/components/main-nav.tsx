@@ -12,6 +12,8 @@ import {
   WandSparkles,
   CheckSquare,
   Package,
+  Info,
+  Mail,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import {
@@ -23,6 +25,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarRail,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { useUser } from '@/firebase';
 
@@ -30,7 +33,6 @@ const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/playground', icon: WandSparkles, label: 'Playground' },
   { href: '/history', icon: History, label: 'History' },
-  { href: '/features', icon: Package, label: 'Features' },
 ];
 
 const featureItems = [
@@ -38,6 +40,12 @@ const featureItems = [
   { href: '/draft', icon: PenSquare, label: 'New Draft' },
   { href: '/grammar-check', icon: CheckSquare, label: 'Grammar Check' },
   { href: '/improve-style', icon: WandSparkles, label: 'Improve Style' },
+]
+
+const infoItems = [
+    { href: '/features', icon: Package, label: 'Features' },
+    { href: '/about', icon: Info, label: 'About' },
+    { href: '/contact', icon: Mail, label: 'Contact' },
 ]
 
 export default function MainNav() {
@@ -70,8 +78,24 @@ export default function MainNav() {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
+        <SidebarSeparator />
         <SidebarMenu>
             {featureItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    icon={<item.icon />}
+                    tooltip={item.label}
+                >
+                    <Link href={item.href}>{item.label}</Link>
+                </SidebarMenuButton>
+                </SidebarMenuItem>
+            ))}
+        </SidebarMenu>
+        <SidebarSeparator />
+        <SidebarMenu>
+            {infoItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                     asChild

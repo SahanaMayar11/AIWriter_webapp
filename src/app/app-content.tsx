@@ -11,7 +11,7 @@ export default function AppContent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const publicRoutes = ["/", "/login", "/signup", "/features"];
+  const publicRoutes = ["/", "/login", "/signup", "/features", "/about", "/contact"];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   if (isPublicRoute) {
