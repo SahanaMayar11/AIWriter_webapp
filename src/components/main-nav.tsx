@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -27,7 +26,6 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { useUser } from '@/firebase';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -50,7 +48,6 @@ const infoItems = [
 
 export default function MainNav() {
   const pathname = usePathname();
-  const { user } = useUser();
 
   return (
     <Sidebar collapsible="icon">
@@ -110,16 +107,6 @@ export default function MainNav() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="font-medium text-sm text-sidebar-foreground">
-              {user?.displayName || 'User'}
-            </span>
-            <span className="text-xs text-sidebar-foreground/70">
-              {user?.email || 'user@example.com'}
-            </span>
-          </div>
-        </div>
         <SidebarMenuButton
           asChild
           icon={<Settings />}

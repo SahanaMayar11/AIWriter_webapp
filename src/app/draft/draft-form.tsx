@@ -35,6 +35,7 @@ import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
 import { useFirestore, useUser, useAppState } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { LoadingIndicator } from '@/components/loading-indicator';
 
 export type FormState = {
   message: string;
@@ -49,6 +50,7 @@ const initialState: FormState = {
 
 function DraftFormContent() {
   const [state, formAction] = useActionState(generateDraftAction, initialState);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useUser();
   const firestore = useFirestore();
@@ -62,13 +64,17 @@ function DraftFormContent() {
   const [outline, setOutline] = useState(searchParams.get('outline') || '');
   const [language, setLanguage] = useState(state.fields?.language || searchParams.get('language') || appLanguage);
 
+  const handleFormAction = (formData: FormData) => {
+    setLoading(true);
+    formAction(formData);
+  };
+
   useEffect(() => {
     setLanguage(appLanguage);
   }, [appLanguage]);
 
   useEffect(() => {
     if (searchParams.get('topic') && formRef.current) {
-        // Use a timeout to ensure state has been updated before submitting
         setTimeout(() => {
             formRef.current?.requestSubmit();
         }, 100);
@@ -76,14 +82,17 @@ function DraftFormContent() {
   }, [searchParams]);
 
   useEffect(() => {
+    if (state.message) {
+      setLoading(false);
+    }
+
     if (state.message && state.message !== 'success') {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: state.message,
       });
-    }
-    if (state.message === 'success') {
+    } else if (state.message === 'success') {
       toast({
         title: 'Success!',
         description: 'Your draft has been generated.',
@@ -142,7 +151,7 @@ function DraftFormContent() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <form action={formAction} ref={formRef}>
+      <form action={handleFormAction} ref={formRef}>
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="font-headline">Draft Details</CardTitle>
@@ -231,7 +240,8 @@ function DraftFormContent() {
         </Card>
       </form>
 
-      <Card className="shadow-sm h-fit">
+      <Card className="shadow-sm h-fit relative">
+        {loading && <LoadingIndicator />}
         <CardHeader className="flex flex-row items-start justify-between">
           <div>
             <CardTitle className="font-headline">Generated Draft</CardTitle>
@@ -242,11 +252,11 @@ function DraftFormContent() {
           {state.draft && (
             <GenerationActions
               textToCopy={state.draft}
-              fileName={`${state.fields?.topic || 'draft'}.txt`}
+              fileName={`${state.fields?.topic || 'draft'}`}
             />
           )}
         </CardHeader>
-        <CardContent className='min-h-[450px]'>
+        <CardContent className="overflow-auto min-h-[450px]">
           <GenerationResult 
             state={state} 
             render={(draft) => <div
@@ -258,7 +268,7 @@ function DraftFormContent() {
           />
         </CardContent>
         {state.draft && (
-            <CardActions className='p-6 pt-0'>
+            <CardActions className="p-6 pt-0">
               <Button onClick={handleSave}>Save Draft</Button>
             </CardActions>
         )}
@@ -270,7 +280,7 @@ function DraftFormContent() {
 
 export function DraftForm() {
     return (
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingIndicator text="Loading form..."/>}>
         <DraftFormContent />
       </Suspense>
     );

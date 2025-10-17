@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Globe, LogOut, Settings, User } from 'lucide-react';
+import { LogOut, Settings, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,17 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { LANGUAGES } from '@/lib/constants';
-import { useAuth, useUser, useAppState } from '@/firebase';
+import { useAuth, useUser } from '@/firebase';
 import { ThemeToggle } from './theme-toggle';
 
 function capitalize(str: string) {
@@ -36,7 +28,6 @@ export default function PageHeader() {
   const { user } = useUser();
   const auth = useAuth();
   const router = useRouter();
-  const { language, setLanguage } = useAppState();
 
   const handleLogout = async () => {
     if (auth) {
@@ -52,21 +43,6 @@ export default function PageHeader() {
         {capitalize(pageName.replace('-', ' '))}
       </h1>
       <div className="ml-auto flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Globe className="h-5 w-5 text-muted-foreground" />
-          <Select value={language} onValueChange={setLanguage}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Language" />
-            </SelectTrigger>
-            <SelectContent>
-              {LANGUAGES.map((lang) => (
-                <SelectItem key={lang.value} value={lang.value}>
-                  {lang.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -81,6 +57,13 @@ export default function PageHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {user && (
+                <div className="px-2 py-1.5 text-sm font-normal">
+                  <p className="font-semibold">{user.displayName}</p>
+                  <p className="text-muted-foreground">{user.email}</p>
+                </div>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/settings">

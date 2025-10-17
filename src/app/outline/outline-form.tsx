@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useActionState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
@@ -25,12 +24,13 @@ import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { LANGUAGES, TONES } from '@/lib/constants';
 import { generateOutlineAction } from './actions';
-import { FileText, Terminal, PenSquare } from 'lucide-react';
+import { FileText, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
 import { useFirestore, useUser, useAppState } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { LoadingIndicator } from '@/components/loading-indicator';
 
 export type FormState = {
   message: string;
@@ -48,10 +48,10 @@ export function OutlineForm() {
     generateOutlineAction,
     initialState
   );
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useUser();
   const firestore = useFirestore();
-  const router = useRouter();
   const { language: appLanguage } = useAppState();
 
   const [topic, setTopic] = useState(state.fields?.topic || '');
@@ -63,11 +63,19 @@ export function OutlineForm() {
     state.fields?.language || appLanguage
   );
 
+  const handleFormAction = (formData: FormData) => {
+    setLoading(true);
+    formAction(formData);
+  };
+
   useEffect(() => {
     setLanguage(appLanguage);
   }, [appLanguage]);
 
   useEffect(() => {
+    if (state.message) {
+      setLoading(false);
+    }
     if (state.message && state.message !== 'success') {
       toast({
         variant: 'destructive',
@@ -136,28 +144,9 @@ export function OutlineForm() {
     }
   };
 
-  const handleGenerateDraft = () => {
-    if (!state.outline || !state.fields) {
-      toast({
-        variant: 'destructive',
-        title: 'Nothing to generate from',
-        description: 'Please generate an outline first.',
-      });
-      return;
-    }
-    const params = new URLSearchParams({
-      topic: state.fields.topic || '',
-      tone: state.fields.tone || '',
-      wordLimit: state.fields.wordLimit || '',
-      outline: state.outline,
-      language: language,
-    });
-    router.push(`/draft?${params.toString()}`);
-  };
-
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <form action={formAction}>
+      <form action={handleFormAction}>
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="font-headline">Outline Details</CardTitle>
@@ -243,7 +232,8 @@ export function OutlineForm() {
         </Card>
       </form>
 
-      <Card className="shadow-sm h-fit">
+      <Card className="shadow-sm h-fit relative">
+        {loading && <LoadingIndicator />}
         <CardHeader className="flex flex-row items-start justify-between">
           <div>
             <CardTitle className="font-headline">Generated Outline</CardTitle>
@@ -254,7 +244,7 @@ export function OutlineForm() {
           {state.outline && (
             <GenerationActions
               textToCopy={state.outline}
-              fileName={`${state.fields?.topic || 'outline'}.txt`}
+              fileName={state.fields?.topic || 'outline'}
             />
           )}
         </CardHeader>
@@ -278,10 +268,6 @@ export function OutlineForm() {
         {state.outline && (
           <CardActions className="p-6 pt-0 space-x-2">
             <Button onClick={handleSave}>Save Outline</Button>
-            <Button variant="secondary" onClick={handleGenerateDraft}>
-              <PenSquare className="mr-2 h-4 w-4" />
-              Generate Draft
-            </Button>
           </CardActions>
         )}
       </Card>

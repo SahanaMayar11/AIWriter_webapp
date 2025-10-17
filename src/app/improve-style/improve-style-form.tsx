@@ -22,6 +22,7 @@ import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
 import { useFirestore, useUser } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { LoadingIndicator } from '@/components/loading-indicator';
 
 export type FormState = {
   message: string;
@@ -36,12 +37,21 @@ const initialState: FormState = {
 
 export function ImproveStyleForm() {
   const [state, formAction] = useActionState(improveStyleAction, initialState);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const [text, setText] = useState(state.fields?.text || '');
   const { user } = useUser();
   const firestore = useFirestore();
 
+  const handleFormAction = (formData: FormData) => {
+    setLoading(true);
+    formAction(formData);
+  };
+
   useEffect(() => {
+    if (state.message) {
+      setLoading(false);
+    }
     if (state.message && state.message !== 'success') {
       toast({
         variant: 'destructive',
@@ -104,7 +114,7 @@ export function ImproveStyleForm() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <form action={formAction}>
+      <form action={handleFormAction}>
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="font-headline">Your Text</CardTitle>
@@ -147,7 +157,8 @@ export function ImproveStyleForm() {
         </Card>
       </form>
 
-      <Card className="shadow-sm h-fit">
+      <Card className="shadow-sm h-fit relative">
+        {loading && <LoadingIndicator />}
         <CardHeader className="flex flex-row items-start justify-between">
           <div>
             <CardTitle className="font-headline">Improved Text</CardTitle>
