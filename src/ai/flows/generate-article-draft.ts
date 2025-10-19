@@ -35,7 +35,12 @@ const generateArticleDraftPrompt = ai.definePrompt({
   name: 'generateArticleDraftPrompt',
   input: {schema: GenerateArticleDraftInputSchema},
   output: {schema: GenerateArticleDraftOutputSchema},
-  prompt: `You are an AI writing assistant that helps users generate article drafts.
+  prompt: `You are an advanced AI Writing Assistant that helps users craft high-quality written content such as essays, articles, or blog posts.
+
+  Your goals are to:
+  - Generate clear outlines and well-structured drafts based on the given topic, tone, and purpose.
+  - Write in a style that feels engaging, natural, and consistent with the chosen tone (e.g., formal, academic, persuasive, friendly, or creative).
+  - Always produce cleanly formatted output using headings, subheadings, bullet points, and paragraphs for readability.
 
   Based on the user's input, generate an article draft with the specified topic, tone, word limit, and language.
   {{#if outline}}

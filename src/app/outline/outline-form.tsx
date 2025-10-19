@@ -5,7 +5,6 @@ import { useActionState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Card,
-  CardActions,
   CardContent,
   CardDescription,
   CardHeader,
@@ -25,11 +24,9 @@ import { useToast } from '@/hooks/use-toast';
 import { LANGUAGES, TONES } from '@/lib/constants';
 import { generateOutlineAction } from './actions';
 import { FileText, Terminal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
-import { useFirestore, useUser, useAppState } from '@/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useAppState } from '@/firebase';
 import { LoadingIndicator } from '@/components/loading-indicator';
 
 export type FormState = {
@@ -50,8 +47,6 @@ export function OutlineForm() {
   );
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { user } = useUser();
-  const firestore = useFirestore();
   const { language: appLanguage } = useAppState();
 
   const [topic, setTopic] = useState(state.fields?.topic || '');
@@ -96,53 +91,6 @@ export function OutlineForm() {
       }
     }
   }, [state, toast, appLanguage]);
-
-  const handleSave = async () => {
-    if (!state.outline || !state.fields) {
-      toast({
-        variant: 'destructive',
-        title: 'Nothing to save',
-        description: 'Please generate an outline first.',
-      });
-      return;
-    }
-    if (!user || !firestore) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'You must be logged in to save.',
-      });
-      return;
-    }
-
-    try {
-      const historyRef = collection(
-        firestore,
-        'users',
-        user.uid,
-        'draftHistories'
-      );
-      await addDoc(historyRef, {
-        topic: state.fields.topic || '',
-        content: state.outline,
-        language: state.fields.language || appLanguage,
-        type: 'Outline',
-        userId: user.uid,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      toast({
-        title: 'Saved!',
-        description: 'Your outline has been saved to your history.',
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error saving outline',
-        description: error instanceof Error ? error.message : String(error),
-      });
-    }
-  };
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
@@ -218,7 +166,7 @@ export function OutlineForm() {
                 <SelectTrigger id="language">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
-                <SelectContent>
+                  <SelectContent>
                   {LANGUAGES.map((lang) => (
                     <SelectItem key={lang.value} value={lang.value}>
                       {lang.label}
@@ -265,11 +213,6 @@ export function OutlineForm() {
             initialMessage="Your generated outline will appear here."
           />
         </CardContent>
-        {state.outline && (
-          <CardActions className="p-6 pt-0 space-x-2">
-            <Button onClick={handleSave}>Save Outline</Button>
-          </CardActions>
-        )}
       </Card>
     </div>
   );

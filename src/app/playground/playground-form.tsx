@@ -13,6 +13,12 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   FileText,
   PenSquare,
   SpellCheck,
@@ -20,12 +26,15 @@ import {
   Save,
   Download,
   Loader2,
+  FileDown,
 } from 'lucide-react';
 import { TONES, PURPOSES } from '@/lib/constants';
 import { useUser, useFirestore, useAppState } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { LoadingIndicator } from '@/components/loading-indicator';
 import { SubmitButton } from '@/components/submit-button';
+import { Document, Packer, Paragraph } from 'docx';
+import PptxGenJS from 'pptxgenjs';
 
 const initialState = {
   message: '',
@@ -46,7 +55,7 @@ function ActionForm({
   isDisabled: boolean;
 }) {
   return (
-    <form action={handleAction} className="flex'>
+    <form action={handleAction} className="flex">
       <input type="hidden" name="action" value={action} />
       <SubmitButton variant="outline" disabled={isDisabled}>
         {children}
@@ -114,7 +123,7 @@ export default function PlaygroundForm() {
     }
     setIsSaving(true);
     try {
-      await addDoc(collection(firestore, 'history'), {
+      await addDoc(collection(firestore, 'users', user.uid, 'draftHistories'), {
         topic: topic || 'Untitled Playground Draft',
         content,
         language,
@@ -123,7 +132,7 @@ export default function PlaygroundForm() {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      toast({ title: 'Saved!', description: 'Saved to your history.' });
+      toast({ title: 'Success', description: 'Draft saved successfully.' });
     } catch (error) {
       toast({ variant: 'destructive', title: 'Error saving', description: String(error) });
     } finally {
@@ -131,18 +140,66 @@ export default function PlaygroundForm() {
     }
   };
 
-  const handleExport = () => {
+  const handleExport = async (format: 'txt' | 'pdf' | 'docx' | 'pptx') => {
     if (!content) {
       toast({ variant: 'destructive', title: 'Nothing to export' });
       return;
     }
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${topic || 'playground'}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
+    
+    const fileName = topic || 'playground';
+
+    if (format === 'txt') {
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${fileName}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else if (format === 'docx') {
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [
+              new Paragraph({ text: content }),
+            ],
+          },
+        ],
+      });
+
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${fileName}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else if (format === 'pptx') {
+      const pptx = new PptxGenJS();
+      const slide = pptx.addSlide();
+      slide.addText(content, { x: 1, y: 1, w: '80%', h: '80%' });
+      const blob = await pptx.write('blob');
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${fileName}.pptx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else if (format === 'pdf') {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`<html><head><title>${fileName}</title></head><body><pre>${content}</pre></body></html>`);
+        printWindow.document.close();
+        printWindow.print();
+      }
+    }
   };
 
   const getLoadingMessage = (action: string | null) => {
@@ -198,9 +255,31 @@ export default function PlaygroundForm() {
           <Button type="button" variant="outline" onClick={handleSave} disabled={anyActionPending || isSaving}>
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} {isSaving ? 'Saving...' : 'Save Draft'}
           </Button>
-          <Button type="button" variant="outline" onClick={handleExport} disabled={anyActionPending || isSaving}>
-            <Download className="mr-2 h-4 w-4" /> Export
-          </Button>
+          <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={anyActionPending || isSaving}>
+                  <Download className="mr-2 h-4 w-4" /> Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExport('txt')}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Download as .txt
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Download as .pdf
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('docx')}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Download as .docx
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('pptx')}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Download as .pptx
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
         </div>
       </div>
 

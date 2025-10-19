@@ -19,7 +19,7 @@ export type CheckGrammarAndStyleInput = z.infer<typeof CheckGrammarAndStyleInput
 const CheckGrammarAndStyleOutputSchema = z.object({
   improvements: z
     .string()
-    .describe('Suggested improvements to the text for grammar and style.'),
+    .describe('A list of suggested improvements to the text for grammar and style.'),
 });
 export type CheckGrammarAndStyleOutput = z.infer<typeof CheckGrammarAndStyleOutputSchema>;
 
@@ -33,9 +33,15 @@ const prompt = ai.definePrompt({
   name: 'checkGrammarAndStylePrompt',
   input: {schema: CheckGrammarAndStyleInputSchema},
   output: {schema: CheckGrammarAndStyleOutputSchema},
-  prompt: `You are an expert writing assistant. Review the following text and suggest improvements to grammar, style, and clarity. Provide specific suggestions and explain why they are needed.
+  prompt: `You are an advanced AI Writing Assistant that helps users craft high-quality written content such as essays, articles, or blog posts.
 
-  Format your response using simple markdown, such as headings, lists, and bold text.
+  Your goals are to:
+  - Ensure grammar, clarity, and coherence are excellent.
+  - Use concise yet expressive language suitable for the target audience.
+
+  Review the following text and suggest improvements to grammar, style, and clarity. Provide specific suggestions and explain why they are needed. If there are no errors, simply say "No errors found."
+
+  Format your response as a list of improvements. Each item in the list should be a distinct suggestion, formatted using simple markdown (e.g., headings, lists, bold text).
 
   Text: {{{text}}}`,
 });

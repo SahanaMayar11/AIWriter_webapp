@@ -17,7 +17,6 @@ import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
 import { improveStyleAction } from './actions';
 import { WandSparkles, Terminal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
 import { useFirestore, useUser } from '@/firebase';
@@ -67,49 +66,31 @@ export function ImproveStyleForm() {
       if (state.fields) {
         setText(state.fields.text || '');
       }
-    }
-  }, [state, toast]);
-
-  const handleSave = async () => {
-    if (!state.improvedText || !state.fields) {
-      toast({
-        variant: 'destructive',
-        title: 'Nothing to save',
-        description: 'Please generate suggestions first.',
-      });
-      return;
-    }
-     if (!user || !firestore) {
-        toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'You must be logged in to save.',
-          });
-        return;
-    }
-    try {
-        const historyRef = collection(firestore, 'users', user.uid, 'draftHistories');
-        await addDoc(historyRef, {
-            topic: state.fields.text?.substring(0, 40) + '...' || 'Style Improvement',
+      if (state.improvedText && state.fields && user && firestore) {
+        const historyRef = collection(firestore, 'users', user.uid, 'generationHistories');
+        addDoc(historyRef, {
+            topic: 'Style Improvement',
             content: state.improvedText,
             language: 'N/A',
-            type: 'Style Improvement',
+            type: 'Style',
             userId: user.uid,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
+        }).then(() => {
+            toast({
+                title: 'Saved!',
+                description: 'Your improvement has been saved to your history.',
+              });
+        }).catch((error) => {
+            toast({
+                variant: 'destructive',
+                title: 'Error saving improvement',
+                description: error instanceof Error ? error.message : String(error),
+            });
         });
-        toast({
-            title: 'Saved!',
-            description: 'Your improvement has been saved to your history.',
-          });
-    } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: 'Error saving improvement',
-            description: error instanceof Error ? error.message : String(error),
-        });
+      }
     }
-  };
+  }, [state, toast, user, firestore]);
 
 
   return (
@@ -152,7 +133,7 @@ export function ImproveStyleForm() {
             </div>
             <SubmitButton className="w-full">
               Improve Style
-            </SubmitButton>
+            </Button>
           </CardContent>
         </Card>
       </form>
@@ -184,11 +165,6 @@ export function ImproveStyleForm() {
              initialMessage="Your improved text will appear here."
            />
         </CardContent>
-        {state.improvedText && (
-          <CardActions className="p-6 pt-0">
-            <Button onClick={handleSave}>Save Improvement</Button>
-          </CardActions>
-        )}
       </Card>
     </div>
   );

@@ -33,11 +33,17 @@ const prompt = ai.definePrompt({
   name: 'improveStylePrompt',
   input: {schema: ImproveStyleInputSchema},
   output: {schema: ImproveStyleOutputSchema},
-  prompt: `You are an expert writing assistant. Review the following text and improve its style, clarity, and engagement. Provide a rewritten version of the text.
+  prompt: `You are an advanced AI Writing Assistant that helps users craft high-quality written content such as essays, articles, or blog posts.
 
-  Format the improved text using simple markdown for paragraphs and spacing.
+  Your primary goal when performing the “Improve Style” function is to refine the text by enhancing vocabulary, flow, tone alignment, and sentence variation — make sure users can feel a clear difference between the original and improved versions.
 
-  Text: {{{text}}}`,
+  Review the following text and rewrite it to improve its style, clarity, and engagement.
+  
+  Do not provide a preamble or any explanation, just the improved text.
+
+  Original Text: {{{text}}}
+
+  Improved Text:`,
 });
 
 const improveStyleFlow = ai.defineFlow(

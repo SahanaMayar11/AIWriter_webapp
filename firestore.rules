@@ -7,11 +7,22 @@ service cloud.firestore {
       allow create: if isOwner(userId);
       allow update: if isExistingOwner(userId);
       allow delete: if isExistingOwner(userId);
-    }
 
-    match /history/{docId} {
-      allow read, delete, update: if isOwner(resource.data.userId);
-      allow create: if isOwner(request.resource.data.userId);
+      match /draftHistories/{docId} {
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId) && resource.data.userId == userId;
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isOwner(userId) && resource.data.userId == userId;
+        allow delete: if isOwner(userId) && resource.data.userId == userId;
+      }
+
+      match /generationHistories/{docId} {
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId) && resource.data.userId == userId;
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isOwner(userId) && resource.data.userId == userId;
+        allow delete: if isOwner(userId) && resource.data.userId == userId;
+      }
     }
 
     match /roles_admin/{adminId} {
@@ -27,11 +38,11 @@ service cloud.firestore {
     }
 
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+      return request.auth != null && request.auth.uid == userId;
     }
 
     function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
+      return isOwner(userId) && resource.data.userId == userId;
     }
   }
 }

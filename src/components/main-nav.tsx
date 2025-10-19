@@ -13,6 +13,7 @@ import {
   Package,
   Info,
   Mail,
+  Save,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import {
@@ -36,6 +37,7 @@ const navItems = [
 const featureItems = [
   { href: '/outline', icon: FileText, label: 'New Outline' },
   { href: '/draft', icon: PenSquare, label: 'New Draft' },
+  { href: '/saved-drafts', icon: Save, label: 'Saved Drafts' },
   { href: '/grammar-check', icon: CheckSquare, label: 'Grammar Check' },
   { href: '/improve-style', icon: WandSparkles, label: 'Improve Style' },
 ]

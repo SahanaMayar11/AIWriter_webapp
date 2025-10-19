@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/alert';
 import {
   Card,
-  CardActions,
   CardContent,
   CardDescription,
   CardHeader,
@@ -30,7 +29,6 @@ import { TONES, LANGUAGES } from '@/lib/constants';
 import { generateDraftAction } from './actions';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { GenerationResult } from '@/components/generation-result';
 import { GenerationActions } from '@/components/generation-actions';
 import { useFirestore, useUser, useAppState } from '@/firebase';
@@ -137,8 +135,8 @@ function DraftFormContent() {
             updatedAt: serverTimestamp(),
         });
         toast({
-            title: 'Saved!',
-            description: 'Your draft has been saved to your history.',
+            title: 'Success',
+            description: 'Draft saved successfully.',
           });
     } catch (error) {
         toast({
@@ -253,6 +251,7 @@ function DraftFormContent() {
             <GenerationActions
               textToCopy={state.draft}
               fileName={`${state.fields?.topic || 'draft'}`}
+              onSave={handleSave}
             />
           )}
         </CardHeader>
@@ -267,11 +266,6 @@ function DraftFormContent() {
             initialMessage="Your generated draft will appear here."
           />
         </CardContent>
-        {state.draft && (
-            <CardActions className="p-6 pt-0">
-              <Button onClick={handleSave}>Save Draft</Button>
-            </CardActions>
-        )}
       </Card>
     </div>
   );
