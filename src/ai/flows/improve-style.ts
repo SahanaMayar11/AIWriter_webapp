@@ -46,6 +46,7 @@ When improving the text, follow these exact goals:
 7. Format the output neatly using paragraphs, bullet points, or headings where appropriate.
 8. If possible, make the text more engaging, polished, and professional — it should *feel improved* from before to after.
 9. Keep the output clean, readable, and visually attractive.
+10. **IMPORTANT**: Preserve the original Markdown formatting of the text. This includes headings (e.g., #, ##), lists (e.g., *, -), bold/italic text, and most importantly, **line breaks and paragraph separation**. Do not flatten the text into a single paragraph.
 
 If the user requests, show both versions:
 **Before:** (the original text)
@@ -54,13 +55,13 @@ If the user requests, show both versions:
 Your tone should be confident, polished, and natural — like an expert editor refining a professional draft.
 
 Output should always be:
-- Formatted clearly.
+- Formatted clearly in Markdown.
 - Free of unnecessary text.
-- In Markdown or rich text style if formatting helps readability.
 
-Original Text: {{{text}}}
+Original Text (in Markdown):
+{{{text}}}
 
-Improved Text:`,
+Improved Text (in Markdown):`,
 });
 
 const improveStyleFlow = ai.defineFlow(

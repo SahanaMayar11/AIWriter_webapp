@@ -27,6 +27,7 @@ import {
   Download,
   Loader2,
   FileDown,
+  ArrowLeft,
 } from 'lucide-react';
 import { TONES, PURPOSES } from '@/lib/constants';
 import { useUser, useFirestore, useAppState } from '@/firebase';
@@ -35,6 +36,7 @@ import { LoadingIndicator } from '@/components/loading-indicator';
 import { SubmitButton } from '@/components/submit-button';
 import { Document, Packer, Paragraph } from 'docx';
 import PptxGenJS from 'pptxgenjs';
+import ReactMarkdown from 'react-markdown';
 
 const initialState = {
   message: '',
@@ -68,6 +70,8 @@ export default function PlaygroundForm() {
   const [state, formAction] = useActionState(playgroundAction, initialState);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showDiff, setShowDiff] = useState(false);
+  const [originalContent, setOriginalContent] = useState('');
 
   const { language } = useAppState();
   const [topic, setTopic] = useState('');
@@ -93,6 +97,8 @@ export default function PlaygroundForm() {
           title: 'Error',
           description: state.message,
         });
+        // If there was an error, revert the diff view
+        setShowDiff(false);
       }
       setPendingAction(null); // Clear pending state
     }
@@ -100,6 +106,13 @@ export default function PlaygroundForm() {
 
   const handleFormAction = (formData: FormData) => {
     const action = formData.get('action') as string;
+    if (action === 'style') {
+      setOriginalContent(content);
+      setShowDiff(true);
+    } else {
+      setShowDiff(false);
+    }
+
     setPendingAction(action);
 
     // Append all necessary fields to the form data
@@ -238,18 +251,26 @@ export default function PlaygroundForm() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <ActionForm action="outline" handleAction={handleFormAction} isDisabled={anyActionPending}>
-          <FileText className="mr-2 h-4 w-4" /> Generate Outline
-        </ActionForm>
-        <ActionForm action="draft" handleAction={handleFormAction} isDisabled={anyActionPending}>
-          <PenSquare className="mr-2 h-4 w-4" /> Create Draft
-        </ActionForm>
-        <ActionForm action="grammar" handleAction={handleFormAction} isDisabled={anyActionPending}>
-          <SpellCheck className="mr-2 h-4 w-4" /> Check Grammar
-        </ActionForm>
-        <ActionForm action="style" handleAction={handleFormAction} isDisabled={anyActionPending}>
-          <WandSparkles className="mr-2 h-4 w-4" /> Improve Style
-        </ActionForm>
+        {showDiff ? (
+          <Button variant="outline" onClick={() => setShowDiff(false)} disabled={anyActionPending}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Editor
+          </Button>
+        ) : (
+          <>
+            <ActionForm action="outline" handleAction={handleFormAction} isDisabled={anyActionPending}>
+              <FileText className="mr-2 h-4 w-4" /> Generate Outline
+            </ActionForm>
+            <ActionForm action="draft" handleAction={handleFormAction} isDisabled={anyActionPending}>
+              <PenSquare className="mr-2 h-4 w-4" /> Create Draft
+            </ActionForm>
+            <ActionForm action="grammar" handleAction={handleFormAction} isDisabled={anyActionPending}>
+              <SpellCheck className="mr-2 h-4 w-4" /> Check Grammar
+            </ActionForm>
+            <ActionForm action="style" handleAction={handleFormAction} isDisabled={anyActionPending}>
+              <WandSparkles className="mr-2 h-4 w-4" /> Improve Style
+            </ActionForm>
+          </>
+        )}
         
         <div className="ml-auto flex items-center gap-2">
           <Button type="button" variant="outline" onClick={handleSave} disabled={anyActionPending || isSaving}>
@@ -285,14 +306,33 @@ export default function PlaygroundForm() {
 
       <div className="flex-1 flex flex-col relative">
         {anyActionPending && <LoadingIndicator text={getLoadingMessage(pendingAction)} />}
-        <Textarea
-          name="content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Start writing your content here, or use the AI tools above to generate an outline or draft..."
-          className={`flex-1 w-full h-full text-base resize-none ${anyActionPending ? 'filter blur-sm' : ''}`}
-          disabled={anyActionPending}
-        />
+        {showDiff ? (
+          <div className="grid grid-cols-2 gap-4 flex-1">
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-center">Before</h3>
+              <Textarea
+                value={originalContent}
+                readOnly
+                className="flex-1 w-full h-full text-base resize-none bg-card"
+              />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-center">After</h3>
+              <div className="prose dark:prose-invert flex-1 w-full h-full text-base resize-none rounded-md border p-4 bg-card">
+                <ReactMarkdown>{content}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <Textarea
+            name="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Start writing your content here, or use the AI tools above to generate an outline or draft..."
+            className={`flex-1 w-full h-full text-base resize-none ${anyActionPending ? 'filter blur-sm' : ''}`}
+            disabled={anyActionPending}
+          />
+        )}
         <div className="text-sm text-muted-foreground p-2 text-right">
           {content.split(/\s+/).filter(Boolean).length} words
         </div>
