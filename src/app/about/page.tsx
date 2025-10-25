@@ -57,10 +57,10 @@ export default function AboutPage() {
           <div className="container px-4 md:px-6 text-center">
             <div className="max-w-3xl mx-auto space-y-4">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
-                About SpellAura AI
+                About WriteSphere
               </h1>
               <p className="text-lg text-muted-foreground md:text-xl">
-                SpellAura AI is an intelligent writing assistant powered by advanced AI technology. We help writers, students, and professionals create better content faster by providing real-time suggestions, grammar checking, and style improvements.
+                WriteSphere is an intelligent writing assistant powered by advanced AI technology. We help writers, students, and professionals create better content faster by providing real-time suggestions, grammar checking, and style improvements.
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function AboutPage() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
-                  How to Use SpellAura AI
+                  How to Use WriteSphere
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   A simple, powerful workflow to transform your writing.
@@ -104,7 +104,7 @@ export default function AboutPage() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
-                  How SpellAura AI Works
+                  How WriteSphere Works
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Our AI-powered platform uses advanced natural language processing to understand your writing needs and provide intelligent assistance.
@@ -155,7 +155,7 @@ export default function AboutPage() {
                 Ready to Get Started?
               </h2>
               <p className="mt-4 max-w-xl mx-auto">
-                Experience the future of writing. Sign up today and let SpellAura AI elevate your content.
+                Experience the future of writing. Sign up today and let WriteSphere elevate your content.
               </p>
               <div className="mt-6">
                 <Button asChild size="lg" variant="secondary">

@@ -1,4 +1,4 @@
-# **App Name**: LinguaCraft AI
+# **App Name**: WriteSphere
 
 ## Core Features:
 

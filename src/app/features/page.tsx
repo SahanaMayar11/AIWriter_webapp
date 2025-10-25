@@ -210,7 +210,7 @@ export default function FeaturesPage() {
                 Ready to Experience These Features?
               </h2>
               <p className="mt-4 max-w-xl mx-auto text-muted-foreground">
-                Start using SpellAura AI today and transform your writing process
+                Start using WriteSphere today and transform your writing process
               </p>
               <div className="mt-6">
                 <Button asChild size="lg">

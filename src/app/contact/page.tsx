@@ -6,8 +6,8 @@ const contactDetails = [
   {
     icon: Mail,
     title: 'Email',
-    value: 'support@spellaura.ai',
-    href: 'mailto:support@spellaura.ai',
+    value: 'support@writesphere.ai',
+    href: 'mailto:support@writesphere.ai',
   },
   {
     icon: Phone,

@@ -139,7 +139,7 @@ export default function SignupPage() {
             Create an Account
           </CardTitle>
           <CardDescription>
-            Enter your information to get started with SpellAura AI
+            Enter your information to get started with WriteSphere
           </CardDescription>
         </CardHeader>
         <CardContent>

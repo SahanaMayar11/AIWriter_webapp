@@ -95,7 +95,7 @@ export default function Home() {
                 Powered by Advanced AI
               </Badge>
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
-                Write Better Essays & Articles with SpellAura AI
+                Write Better Essays & Articles with WriteSphere
               </h1>
               <p className="text-lg text-muted-foreground md:text-xl">
                 Generate outlines, create drafts, check grammar, and improve
@@ -188,7 +188,7 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
-                    Why Choose SpellAura AI?
+                    Why Choose WriteSphere?
                   </h2>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed">
                     More than just a writing tool - it&apos;s your intelligent
