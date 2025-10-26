@@ -75,4 +75,12 @@ export const playgroundFormSchema = z.discriminatedUnion('action', [
     purpose: z.string(),
     language: z.string(),
   }),
+  z.object({
+    action: z.literal('correct-grammar'),
+    content: z.string().min(20, 'Content must be at least 20 characters long.'),
+    topic: z.string().optional(),
+    tone: z.string(),
+    purpose: z.string(),
+    language: z.string(),
+  }),
 ]);

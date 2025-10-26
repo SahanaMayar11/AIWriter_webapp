@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -129,7 +128,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex items-center justify-center min-h-screen">
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">

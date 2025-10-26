@@ -28,6 +28,7 @@ import {
   Loader2,
   FileDown,
   ArrowLeft,
+  CheckCheck,
 } from 'lucide-react';
 import { TONES, PURPOSES } from '@/lib/constants';
 import { useUser, useFirestore, useAppState } from '@/firebase';
@@ -38,10 +39,17 @@ import { Document, Packer, Paragraph } from 'docx';
 import PptxGenJS from 'pptxgenjs';
 import ReactMarkdown from 'react-markdown';
 
-const initialState = {
+const initialState: {
+  message: string;
+  result?: string;
+  fields?: Record<string, string>;
+  issues?: string[];
+  action?: string;
+} = {
   message: '',
   result: '',
   fields: {},
+  issues: [],
   action: '',
 };
 
@@ -92,10 +100,13 @@ export default function PlaygroundForm() {
           description: `Content has been ${state.action}ed.`,
         });
       } else if (state.message && state.message !== 'success') {
+        const description = state.issues?.length
+          ? state.issues.join(', ')
+          : state.message;
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: state.message,
+          description,
         });
         // If there was an error, revert the diff view
         setShowDiff(false);
@@ -106,7 +117,7 @@ export default function PlaygroundForm() {
 
   const handleFormAction = (formData: FormData) => {
     const action = formData.get('action') as string;
-    if (action === 'style') {
+    if (action === 'style' || action === 'correct-grammar') {
       setOriginalContent(content);
       setShowDiff(true);
     } else {
@@ -221,6 +232,7 @@ export default function PlaygroundForm() {
       case 'draft': return 'Creating Draft...';
       case 'grammar': return 'Checking Grammar...';
       case 'style': return 'Improving Style...';
+      case 'correct-grammar': return 'Correcting Grammar...';
       default: return 'Generating Content...';
     }
   };
@@ -265,6 +277,9 @@ export default function PlaygroundForm() {
             </ActionForm>
             <ActionForm action="grammar" handleAction={handleFormAction} isDisabled={anyActionPending}>
               <SpellCheck className="mr-2 h-4 w-4" /> Check Grammar
+            </ActionForm>
+             <ActionForm action="correct-grammar" handleAction={handleFormAction} isDisabled={anyActionPending}>
+              <CheckCheck className="mr-2 h-4 w-4" /> Correct Grammar
             </ActionForm>
             <ActionForm action="style" handleAction={handleFormAction} isDisabled={anyActionPending}>
               <WandSparkles className="mr-2 h-4 w-4" /> Improve Style
@@ -318,9 +333,17 @@ export default function PlaygroundForm() {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2 text-center">After</h3>
-              <div className="prose dark:prose-invert flex-1 w-full h-full text-base resize-none rounded-md border p-4 bg-card">
-                <ReactMarkdown>{content}</ReactMarkdown>
-              </div>
+              {state.action === 'style' ? (
+                <div className="prose dark:prose-invert flex-1 w-full h-full text-base resize-none rounded-md border p-4 bg-card">
+                  <ReactMarkdown>{content}</ReactMarkdown>
+                </div>
+              ) : (
+                <Textarea
+                  value={content}
+                  readOnly
+                  className="flex-1 w-full h-full text-base resize-none bg-card"
+                />
+              )}
             </div>
           </div>
         ) : (

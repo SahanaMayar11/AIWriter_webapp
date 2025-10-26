@@ -12,6 +12,9 @@ import {
 import {
     improveStyle,
 } from '@/ai/flows/improve-style';
+import {
+    correctGrammar,
+} from '@/ai/flows/correct-grammar';
 import { playgroundFormSchema } from '@/lib/schemas';
 
 type FormState = {
@@ -40,35 +43,41 @@ export async function playgroundAction(
     };
   }
   
-  const { topic, tone, purpose, content } = validatedFields.data;
-
   try {
     let result: { [key: string]: any } | null = null;
     let resultKey: string = '';
 
-    if (action === 'outline') {
-      result = await generateEssayOutline({
-        topic: topic,
-        tone: tone,
-        language: 'english', 
-        wordLimit: 1000, 
-      });
-      resultKey = 'outline';
-    } else if (action === 'draft') {
-      result = await generateArticleDraft({
-        topic: topic,
-        tone: tone,
-        wordLimit: 1000,
-      });
-      resultKey = 'draft';
-    } else if (action === 'grammar') {
-      result = await checkGrammarAndStyle({ text: content || '' });
-      resultKey = 'improvements';
-    } else if (action === 'style') {
-        result = await improveStyle({ text: content || '' });
+    if (validatedFields.data.action === 'outline') {
+        const { topic, tone, language } = validatedFields.data;
+        result = await generateEssayOutline({
+            topic,
+            tone,
+            language,
+            wordLimit: 1000,
+        });
+        resultKey = 'outline';
+    } else if (validatedFields.data.action === 'draft') {
+        const { topic, tone, purpose } = validatedFields.data;
+        result = await generateArticleDraft({
+            topic,
+            tone,
+            purpose,
+            wordLimit: 1000,
+        });
+        resultKey = 'draft';
+    } else if (validatedFields.data.action === 'grammar') {
+        const { content } = validatedFields.data;
+        result = await checkGrammarAndStyle({ text: content });
+        resultKey = 'improvements';
+    } else if (validatedFields.data.action === 'style') {
+        const { content } = validatedFields.data;
+        result = await improveStyle({ text: content });
         resultKey = 'improvedText';
+    } else if (validatedFields.data.action === 'correct-grammar') {
+        const { content } = validatedFields.data;
+        result = await correctGrammar({ text: content });
+        resultKey = 'correctedText';
     }
-
 
     if (result && result[resultKey]) {
       return { message: 'success', result: result[resultKey], fields, action };
