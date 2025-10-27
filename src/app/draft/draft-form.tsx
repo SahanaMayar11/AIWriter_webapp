@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
-import { TONES, LANGUAGES } from '@/lib/constants';
+import { TONES, LANGUAGES, PURPOSES } from '@/lib/constants';
 import { generateDraftAction } from './actions';
 import { PenSquare, Terminal } from 'lucide-react';
 import { Label } from '@/components/ui/label';
@@ -58,6 +58,7 @@ function DraftFormContent() {
   
   const [topic, setTopic] = useState(state.fields?.topic || searchParams.get('topic') || '');
   const [tone, setTone] = useState(state.fields?.tone || searchParams.get('tone') || 'academic');
+  const [purpose, setPurpose] = useState(state.fields?.purpose || searchParams.get('purpose') || 'essay');
   const [wordLimit, setWordLimit] = useState(state.fields?.wordLimit || searchParams.get('wordLimit') || '1000');
   const [outline, setOutline] = useState(searchParams.get('outline') || '');
   const [language, setLanguage] = useState(state.fields?.language || searchParams.get('language') || appLanguage);
@@ -98,6 +99,7 @@ function DraftFormContent() {
        if (state.fields) {
         setTopic(state.fields.topic || '');
         setTone(state.fields.tone || 'academic');
+        setPurpose(state.fields.purpose || 'essay');
         setWordLimit(state.fields.wordLimit || '1000');
         setOutline(state.fields.outline || '');
         setLanguage(state.fields.language || appLanguage);
@@ -210,6 +212,21 @@ function DraftFormContent() {
                   required
                 />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="purpose">Purpose</Label>
+              <Select name="purpose" value={purpose} onValueChange={setPurpose}>
+                <SelectTrigger id="purpose">
+                  <SelectValue placeholder="Select purpose" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PURPOSES.map((p) => (
+                    <SelectItem key={p.value} value={p.value}>
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
              <div className="space-y-2">
               <Label htmlFor="language">Language</Label>

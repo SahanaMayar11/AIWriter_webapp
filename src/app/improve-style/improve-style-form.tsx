@@ -92,6 +92,13 @@ export function ImproveStyleForm() {
     }
   }, [state, toast, user, firestore]);
 
+  const renderImprovedText = (improvedText: string) => (
+    <div
+      className="prose prose-sm dark:prose-invert max-w-none"
+      dangerouslySetInnerHTML={{ __html: improvedText.replace(/\n/g, '<br />') }}
+    ></div>
+  );
+
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
@@ -133,7 +140,7 @@ export function ImproveStyleForm() {
             </div>
             <SubmitButton className="w-full">
               Improve Style
-            </Button>
+            </SubmitButton>
           </CardContent>
         </Card>
       </form>
@@ -155,12 +162,9 @@ export function ImproveStyleForm() {
           )}
         </CardHeader>
         <CardContent className="overflow-auto min-h-[320px]">
-           <GenerationResult 
+           <GenerationResult
              state={state}
-             render={(improvedText) => <div
-                className="prose prose-sm dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: improvedText.replace(/\n/g, '<br />') }}
-              />}
+             render={renderImprovedText}
              initialIcon={<WandSparkles className="h-16 w-16 text-muted-foreground/50" />}
              initialMessage="Your improved text will appear here."
            />

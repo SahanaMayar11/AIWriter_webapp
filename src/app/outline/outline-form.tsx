@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select';
 import { SubmitButton } from '@/components/submit-button';
 import { useToast } from '@/hooks/use-toast';
-import { LANGUAGES, TONES } from '@/lib/constants';
+import { LANGUAGES, TONES, PURPOSES } from '@/lib/constants';
 import { generateOutlineAction } from './actions';
 import { FileText, Terminal } from 'lucide-react';
 import { GenerationResult } from '@/components/generation-result';
@@ -51,6 +51,7 @@ export function OutlineForm() {
 
   const [topic, setTopic] = useState(state.fields?.topic || '');
   const [tone, setTone] = useState(state.fields?.tone || 'academic');
+  const [purpose, setPurpose] = useState(state.fields?.purpose || 'essay');
   const [wordLimit, setWordLimit] = useState(
     state.fields?.wordLimit || '2000'
   );
@@ -86,6 +87,7 @@ export function OutlineForm() {
       if (state.fields) {
         setTopic(state.fields.topic || '');
         setTone(state.fields.tone || 'academic');
+        setPurpose(state.fields.purpose || 'essay');
         setWordLimit(state.fields.wordLimit || '2000');
         setLanguage(state.fields.language || appLanguage);
       }
@@ -155,6 +157,21 @@ export function OutlineForm() {
                   required
                 />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="purpose">Purpose</Label>
+              <Select name="purpose" value={purpose} onValueChange={setPurpose}>
+                <SelectTrigger id="purpose">
+                  <SelectValue placeholder="Select purpose" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PURPOSES.map((p) => (
+                    <SelectItem key={p.value} value={p.value}>
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="language">Language</Label>

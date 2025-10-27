@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const draftFormSchema = z.object({
   topic: z.string().min(5, 'Topic must be at least 5 characters long.'),
   tone: z.string(),
+  purpose: z.string(),
   wordLimit: z.coerce
     .number()
     .min(50, 'Word limit must be at least 50.')
@@ -14,6 +15,7 @@ export const draftFormSchema = z.object({
 export const outlineFormSchema = z.object({
   topic: z.string().min(5, 'Topic must be at least 5 characters long.'),
   tone: z.string(),
+  purpose: z.string(),
   wordLimit: z.coerce
     .number()
     .min(50, 'Word limit must be at least 50.')
