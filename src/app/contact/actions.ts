@@ -34,9 +34,12 @@ export async function submitContactForm(
     };
   }
 
-  // Here you would typically send an email or save to a database.
-  // For this demo, we'll just log it and return a success message.
-  console.log('Contact form submitted:', validatedFields.data);
+  // Simulate a delay to make it seem like the form is being processed
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // In a real application, you would handle the form submission here, 
+  // for example, by sending an email or saving the data to a database.
+  console.log('Form submitted successfully:', validatedFields.data);
 
   return { message: 'success' };
 }

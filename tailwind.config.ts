@@ -85,10 +85,24 @@ export default {
             height: '0',
           },
         },
+        'bounce-in': {
+            '0%': {
+                transform: 'scale(0.9)',
+                opacity: '0',
+            },
+            '50%': {
+                transform: 'scale(1.05)',
+                opacity: '1',
+            },
+            '100%': {
+                transform: 'scale(1)',
+            },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'bounce-in': 'bounce-in 0.3s ease-out',
       },
       boxShadow: {
         'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',

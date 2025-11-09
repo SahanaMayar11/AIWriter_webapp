@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -51,7 +50,7 @@ export default function PageHeader() {
               size="icon"
               className="overflow-hidden rounded-full bg-slate-200"
             >
-              <User className="h-5 w-5" />
+              <User className="h-5 w-5 text-black" />
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>

@@ -1,8 +1,10 @@
+
 'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useAuth } from '@/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,86 +15,69 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import { Icons } from '@/components/icons';
-import { useAuth, useUser } from '@/firebase';
-import {
-  signInWithEmailAndPassword,
-  type Auth,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth';
-import type { FirebaseError } from 'firebase/app';
-
-async function initiateEmailSignIn(
-  auth: Auth,
-  email: string,
-  password: string
-): Promise<void> {
-  await signInWithEmailAndPassword(auth, email, password);
-}
-
-async function initiateGoogleSignIn(auth: Auth): Promise<void> {
-  const provider = new GoogleAuthProvider();
-  await signInWithPopup(auth, provider);
-}
+import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const auth = useAuth();
-  const { user, isUserLoading } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const auth = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    if (!isUserLoading && user) {
-      router.push('/dashboard');
-    }
-  }, [user, isUserLoading, router]);
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
-    if (!auth) return;
+    setIsLoading(true);
+    if (!auth) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Firebase Auth is not initialized.',
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await initiateEmailSignIn(auth, email, password);
-    } catch (err) {
-      const error = err as FirebaseError;
-      switch (error.code) {
-        case 'auth/wrong-password':
-          setError('Incorrect password. Please try again.');
-          break;
-        case 'auth/user-not-found':
-          setError('No account found with this email address.');
-          break;
-        case 'auth/invalid-credential':
-          setError('Invalid credentials. Please check your email and password.');
-          break;
-        default:
-          setError('An unknown error occurred. Please try again.');
-          break;
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      toast({
+        title: 'Login Successful',
+        description: 'Redirecting you to the dashboard...',
+      });
+      router.push('/');
+    } catch (error: any) {
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+            errorMessage = 'No user found with this email.';
+            break;
+          case 'auth/wrong-password':
+            errorMessage = 'Incorrect password. Please try again.';
+            break;
+          case 'auth/invalid-email':
+            errorMessage = 'The email address is not valid.';
+            break;
+          default:
+            errorMessage = error.message;
+        }
       }
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const handleGoogleLogin = async () => {
-    setError(null);
-    if (!auth) return;
-    try {
-      await initiateGoogleSignIn(auth);
-    } catch (err) {
-      const error = err as FirebaseError;
-      setError(error.message);
-    }
-  };
-
-  if (isUserLoading || user) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
 
   return (
     <div className="flex items-center justify-center h-full">
@@ -123,15 +108,7 @@ export default function LoginPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="#"
-                    className="ml-auto inline-block text-sm underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -140,27 +117,17 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && (
-                <p className="text-sm text-destructive text-center">{error}</p>
-              )}
-              <Button type="submit" className="w-full gradient-button">
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Login
               </Button>
             </form>
-            <Button
-              variant="outline"
-              className="w-full"
-              type="button"
-              onClick={handleGoogleLogin}
-            >
-              Continue with Google
-            </Button>
-          </div>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="underline">
-              Sign up
-            </Link>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{
+              <Link href="/signup" className="underline">
+                Sign up
+              </Link>}
+            </div>
           </div>
         </CardContent>
       </Card>

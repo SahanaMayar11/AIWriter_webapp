@@ -58,7 +58,7 @@ export default function MainNav() {
         <div className="flex items-center gap-2">
           <Icons.logo className="size-7" />
           <span className="text-lg font-semibold font-headline gradient-text">
-            WriteSphere
+            𝓦𝓻𝓲𝓽𝓮𝓢𝓹𝓱𝓮𝓻𝓮
           </span>
         </div>
       </SidebarHeader>

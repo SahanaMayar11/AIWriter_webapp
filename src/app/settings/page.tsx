@@ -2,11 +2,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -36,7 +38,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { updateProfile } from './actions';
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      Save Changes
+    </Button>
+  );
+}
 
 export default function SettingsPage() {
   const { user, isUserLoading } = useUser();
@@ -52,6 +65,23 @@ export default function SettingsPage() {
   }, [user, firestore]);
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc(userDocRef);
+
+  const [formState, formAction] = useFormState(updateProfile, { message: '' });
+
+  useEffect(() => {
+    if (formState.message === 'success') {
+      toast({
+        title: 'Profile Updated',
+        description: 'Your profile has been updated successfully.',
+      });
+    } else if (formState.message) {
+      toast({
+        variant: 'destructive',
+        title: 'An error occurred.',
+        description: formState.message,
+      });
+    }
+  }, [formState, toast]);
 
 
   const handleDeleteAccount = async () => {
@@ -91,7 +121,7 @@ export default function SettingsPage() {
 
   return (
     <div className="grid gap-6">
-      <div className="grid auto-rows-max gap-6 lg:col-span-2">
+      <form action={formAction} className="grid auto-rows-max gap-6 lg:col-span-2">
         <Card>
             <CardHeader>
               <CardTitle className="font-headline">Profile</CardTitle>
@@ -104,7 +134,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="grid gap-2">
                     <Label htmlFor="name">Name</Label>
-                    <Input id="name" value={userProfile?.name || ''} disabled />
+                    <Input id="name" name="name" defaultValue={userProfile?.name || ''} />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -116,8 +146,8 @@ export default function SettingsPage() {
                   <div className="grid gap-2">
                     <Label htmlFor="language">Preferred Language</Label>
                     <Select
-                      value={userProfile?.preferredLanguage || 'english'}
-                      disabled
+                      name="preferredLanguage"
+                      defaultValue={userProfile?.preferredLanguage || 'english'}
                     >
                       <SelectTrigger id="language">
                         <SelectValue placeholder="Select language" />
@@ -133,7 +163,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="tone">Default Tone</Label>
-                     <Select value={userProfile?.preferredTone || 'casual'} disabled>
+                     <Select name="preferredTone" defaultValue={userProfile?.preferredTone || 'casual'}>
                       <SelectTrigger id="tone">
                         <SelectValue placeholder="Select tone" />
                       </SelectTrigger>
@@ -149,7 +179,11 @@ export default function SettingsPage() {
                 </div>
               </div>
             </CardContent>
+            <CardFooter className="border-t px-6 py-4">
+              <SubmitButton />
+            </CardFooter>
         </Card>
+      </form>
 
         <Card>
           <CardHeader>
@@ -184,7 +218,6 @@ export default function SettingsPage() {
             </p>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

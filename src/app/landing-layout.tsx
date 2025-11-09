@@ -16,7 +16,7 @@ export default function LandingLayout({
       <header className="px-4 lg:px-6 h-14 flex items-center bg-background fixed top-0 left-0 right-0 z-50 border-b">
         <Link href="/" className="flex items-center justify-center">
           <Icons.logo className="h-6 w-6 gradient-text" />
-          <span className="ml-2 text-lg font-semibold font-headline">WriteSphere</span>
+          <span className="ml-2 text-lg font-semibold font-headline">𝓦𝓻𝓲𝓽𝓮𝓢𝓹𝓱𝓮𝓻𝓮</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Home</Link>
@@ -38,7 +38,7 @@ export default function LandingLayout({
             <div className="space-y-4 md:col-span-2">
               <Link href="/" className="flex items-center">
                 <Icons.logo className="h-7 w-7 gradient-text" />
-                <span className="ml-2 text-xl font-bold font-headline">WriteSphere</span>
+                <span className="ml-2 text-xl font-bold font-headline">𝓦𝓻𝓲𝓽𝓮𝓢𝓹𝓱𝓮𝓻𝓮</span>
               </Link>
               <p className="max-w-xs text-muted-foreground text-sm">
                 Your intelligent writing companion. Generate outlines, create drafts, check grammar, and improve your writing style with AI-powered assistance.
