@@ -138,7 +138,7 @@ export function ImproveStyleForm() {
                 onChange={(e) => setText(e.target.value)}
               />
             </div>
-            <SubmitButton className="w-full">
+            <SubmitButton className="w-full gradient-button">
               Improve Style
             </SubmitButton>
           </CardContent>

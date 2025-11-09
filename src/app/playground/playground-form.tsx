@@ -67,7 +67,7 @@ function ActionForm({
   return (
     <form action={handleAction} className="flex">
       <input type="hidden" name="action" value={action} />
-      <SubmitButton variant="outline" disabled={isDisabled}>
+      <SubmitButton disabled={isDisabled} className="gradient-button">
         {children}
       </SubmitButton>
     </form>
@@ -264,7 +264,7 @@ export default function PlaygroundForm() {
 
       <div className="flex flex-wrap items-center gap-2">
         {showDiff ? (
-          <Button variant="outline" onClick={() => setShowDiff(false)} disabled={anyActionPending}>
+          <Button onClick={() => setShowDiff(false)} disabled={anyActionPending} className="gradient-button">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Editor
           </Button>
         ) : (
@@ -288,12 +288,12 @@ export default function PlaygroundForm() {
         )}
         
         <div className="ml-auto flex items-center gap-2">
-          <Button type="button" variant="outline" onClick={handleSave} disabled={anyActionPending || isSaving}>
+          <Button type="button" onClick={handleSave} disabled={anyActionPending || isSaving} className="gradient-button">
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} {isSaving ? 'Saving...' : 'Save Draft'}
           </Button>
           <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" disabled={anyActionPending || isSaving}>
+                <Button disabled={anyActionPending || isSaving} className="gradient-button">
                   <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
               </DropdownMenuTrigger>

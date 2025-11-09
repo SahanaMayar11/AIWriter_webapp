@@ -11,7 +11,7 @@ export function SubmitButton({
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending} {...props}>
+    <Button type="submit" disabled={pending} className="gradient-button" {...props}>
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {children}
     </Button>

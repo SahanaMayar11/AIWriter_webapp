@@ -71,7 +71,7 @@ export default function DashboardPage() {
           Welcome back, {getFirstName()}!
         </h1>
         <p className="text-muted-foreground mt-2">
-          Ready to craft your next masterpiece? Let&apos;s get writing.
+          Ready to craft your next masterpiece? Let's get writing.
         </p>
       </div>
 
@@ -91,7 +91,7 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">
                 {action.description}
               </p>
-              <Button asChild variant="link" className="px-0 mt-4">
+              <Button asChild className="mt-4 gradient-button">
                 <Link href={action.href}>
                   Start Writing <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -117,7 +117,7 @@ export default function DashboardPage() {
                 <blockquote className="border-l-2 pl-6 italic text-lg">
                   &quot;{prompt}&quot;
                 </blockquote>
-                <Button asChild variant="link" className="px-0 mt-4">
+                <Button asChild className="mt-4 gradient-button">
                   <Link href={`/playground?prompt=${encodeURIComponent(prompt)}`}>
                     Start Writing <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

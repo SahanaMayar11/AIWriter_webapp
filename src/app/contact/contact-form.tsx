@@ -80,7 +80,7 @@ export function ContactForm() {
         <Label htmlFor="message">Message</Label>
         <Textarea id="message" name="message" placeholder="Enter your message" className="min-h-[150px]" required />
       </div>
-      <SubmitButton>
+      <SubmitButton className="gradient-button">
         <Send className="mr-2 h-4 w-4" />
         Send Message
       </SubmitButton>

@@ -143,7 +143,7 @@ export default function LoginPage() {
               {error && (
                 <p className="text-sm text-destructive text-center">{error}</p>
               )}
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full gradient-button">
                 Login
               </Button>
             </form>

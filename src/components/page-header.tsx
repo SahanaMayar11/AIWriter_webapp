@@ -37,9 +37,9 @@ export default function PageHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SidebarTrigger />
-      <h1 className="text-xl font-semibold md:text-2xl font-headline hidden sm:block">
+      <h1 className="text-xl font-semibold md:text-2xl gradient-text">
         {capitalize(pageName.replace('-', ' '))}
       </h1>
       <div className="ml-auto flex items-center gap-4">
@@ -49,19 +49,19 @@ export default function PageHeader() {
             <Button
               variant="outline"
               size="icon"
-              className="overflow-hidden rounded-full"
+              className="overflow-hidden rounded-full bg-slate-200"
             >
               <User className="h-5 w-5" />
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="card">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {user && (
                 <div className="px-2 py-1.5 text-sm font-normal">
                   <p className="font-semibold">{user.displayName}</p>
-                  <p className="text-muted-foreground">{user.email}</p>
+                  <p>{user.email}</p>
                 </div>
             )}
             <DropdownMenuSeparator />

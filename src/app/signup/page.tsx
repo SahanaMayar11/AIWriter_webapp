@@ -184,7 +184,7 @@ export default function SignupPage() {
             </form>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full gradient-button"
               type="button"
               onClick={handleGoogleSignUp}
             >

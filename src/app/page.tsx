@@ -102,10 +102,10 @@ export default function Home() {
                 understands your tone and purpose.
               </p>
               <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-                <Button asChild size="lg">
+                <Button asChild size="lg" className="gradient-button">
                   <Link href="/signup">Start Writing Now</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline">
+                <Button asChild size="lg" className="gradient-button">
                   <Link href="/features">Explore Features</Link>
                 </Button>
               </div>
@@ -251,7 +251,7 @@ export default function Home() {
                 faster.
               </p>
               <div className="mt-6">
-                <Button asChild size="lg" variant="secondary">
+                <Button asChild size="lg" className="gradient-button">
                   <Link href="/signup">Get Started Now</Link>
                 </Button>
               </div>
