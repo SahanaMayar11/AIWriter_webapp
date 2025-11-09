@@ -8,14 +8,19 @@ export const Icons = {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-      <path d="m15 5-3 3" />
+      <defs>
+        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#314755" />
+          <stop offset="100%" stopColor="#26a0da" />
+        </linearGradient>
+      </defs>
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" stroke="url(#logo-gradient)" />
+      <path d="m15 5-3 3" stroke="url(#logo-gradient)" />
     </svg>
   ),
 };

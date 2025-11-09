@@ -192,7 +192,7 @@ export function OutlineForm() {
                 </SelectContent>
               </Select>
             </div>
-            <SubmitButton className="w-full gradient-button">Generate Outline</SubmitButton>
+            <SubmitButton className="w-full btn-grad">Generate Outline</SubmitButton>
           </CardContent>
         </Card>
       </form>

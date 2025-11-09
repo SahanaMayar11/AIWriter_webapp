@@ -250,7 +250,7 @@ function DraftFormContent() {
             {outline && (
               <input type="hidden" name="outline" value={outline} />
             )}
-            <SubmitButton className="w-full gradient-button">Generate Draft</SubmitButton>
+            <SubmitButton className="w-full btn-grad">Generate Draft</SubmitButton>
           </CardContent>
         </Card>
       </form>

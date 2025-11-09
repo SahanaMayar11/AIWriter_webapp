@@ -130,7 +130,7 @@ export function GrammarCheckForm() {
                 onChange={(e) => setText(e.target.value)}
               />
             </div>
-            <SubmitButton className="w-full gradient-button">
+            <SubmitButton className="w-full btn-grad">
               Check Grammar & Style
             </SubmitButton>
           </CardContent>

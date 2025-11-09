@@ -91,7 +91,7 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">
                 {action.description}
               </p>
-              <Button asChild className="mt-4 gradient-button">
+              <Button asChild className="mt-4 btn-grad">
                 <Link href={action.href}>
                   Start Writing <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -117,7 +117,7 @@ export default function DashboardPage() {
                 <blockquote className="border-l-2 pl-6 italic text-lg">
                   &quot;{prompt}&quot;
                 </blockquote>
-                <Button asChild className="mt-4 gradient-button">
+                <Button asChild className="mt-4 btn-grad">
                   <Link href={`/playground?prompt=${encodeURIComponent(prompt)}`}>
                     Start Writing <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

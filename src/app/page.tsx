@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const features = [
   {
@@ -102,10 +103,10 @@ export default function Home() {
                 understands your tone and purpose.
               </p>
               <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-                <Button asChild size="lg" className="gradient-button">
+                <Button asChild size="lg" className="btn-grad">
                   <Link href="/signup">Start Writing Now</Link>
                 </Button>
-                <Button asChild size="lg" className="gradient-button">
+                <Button asChild size="lg" className="btn-grad">
                   <Link href="/features">Explore Features</Link>
                 </Button>
               </div>
@@ -131,17 +132,19 @@ export default function Home() {
             </div>
             <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-12 mt-12">
               {features.map((feature, index) => (
-                <div key={index} className="grid gap-1">
-                  <div className="flex items-center gap-2">
+                <Card key={index}>
+                  <CardHeader className="flex-row items-center gap-2">
                     <feature.icon className="w-6 h-6 text-primary" />
-                    <h3 className="text-lg font-bold font-headline">
+                    <CardTitle className="text-lg font-bold font-headline">
                       {feature.title}
-                    </h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
@@ -213,7 +216,7 @@ export default function Home() {
                   ))}
                 </ul>
               </div>
-              <div className="bg-background rounded-lg shadow-lg p-8 space-y-6">
+              <Card className="p-8 space-y-6">
                 <div className="flex items-center gap-4">
                   <Zap className="h-8 w-8 text-primary" />
                   <div>
@@ -235,7 +238,7 @@ export default function Home() {
                     <p className="text-muted-foreground">Essays Generated</p>
                   </div>
                 </div>
-              </div>
+              </Card>
             </div>
           </div>
         </section>
@@ -251,7 +254,7 @@ export default function Home() {
                 faster.
               </p>
               <div className="mt-6">
-                <Button asChild size="lg" className="gradient-button">
+                <Button asChild size="lg" className="btn-grad">
                   <Link href="/signup">Get Started Now</Link>
                 </Button>
               </div>

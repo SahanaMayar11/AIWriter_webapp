@@ -67,7 +67,7 @@ function ActionForm({
   return (
     <form action={handleAction} className="flex">
       <input type="hidden" name="action" value={action} />
-      <SubmitButton disabled={isDisabled} className="gradient-button">
+      <SubmitButton disabled={isDisabled} className="btn-grad">
         {children}
       </SubmitButton>
     </form>
@@ -264,7 +264,7 @@ export default function PlaygroundForm() {
 
       <div className="flex flex-wrap items-center gap-2">
         {showDiff ? (
-          <Button onClick={() => setShowDiff(false)} disabled={anyActionPending} className="gradient-button">
+          <Button onClick={() => setShowDiff(false)} disabled={anyActionPending} className="btn-grad">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Editor
           </Button>
         ) : (
@@ -288,12 +288,12 @@ export default function PlaygroundForm() {
         )}
         
         <div className="ml-auto flex items-center gap-2">
-          <Button type="button" onClick={handleSave} disabled={anyActionPending || isSaving} className="gradient-button">
+          <Button type="button" onClick={handleSave} disabled={anyActionPending || isSaving} className="btn-grad">
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} {isSaving ? 'Saving...' : 'Save Draft'}
           </Button>
           <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button disabled={anyActionPending || isSaving} className="gradient-button">
+                <Button disabled={anyActionPending || isSaving} className="btn-grad">
                   <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
               </DropdownMenuTrigger>
@@ -341,7 +341,7 @@ export default function PlaygroundForm() {
                 <Textarea
                   value={content}
                   readOnly
-                  className="flex-1 w-full h-full text-base resize-none bg-card"
+                  className="flex-1 w-full h--full text-base resize-none bg-card"
                 />
               )}
             </div>

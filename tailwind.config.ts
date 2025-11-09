@@ -1,4 +1,3 @@
-
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -60,10 +59,8 @@ export default {
           DEFAULT: '#0f172a',
           foreground: '#94a3b8',
         },
-        'gradient-from': '#6a11cb',
-        'gradient-to': '#2575fc',
-        'gradient-from-hover': '#7d2ef9',
-        'gradient-to-hover': '#4089ff',
+        'gradient-from': '#314755',
+        'gradient-to': '#26a0da',
       },
       borderRadius: {
         '2xl': 'calc(var(--radius) + 4px)',
