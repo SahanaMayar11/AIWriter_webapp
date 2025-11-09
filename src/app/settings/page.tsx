@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -27,6 +27,7 @@ import { doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { updateProfile } from '@/app/settings/actions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,15 +39,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { updateProfile } from './actions';
+import { useState } from 'react';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
     <Button type="submit" disabled={pending}>
-      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      Save Changes
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Save Changes
     </Button>
   );
 }
@@ -66,23 +66,24 @@ export default function SettingsPage() {
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc(userDocRef);
 
-  const [formState, formAction] = useFormState(updateProfile, { message: '' });
+  const [state, formAction] = useActionState(updateProfile, {
+    message: '',
+  });
 
   useEffect(() => {
-    if (formState.message === 'success') {
-      toast({
-        title: 'Profile Updated',
-        description: 'Your profile has been updated successfully.',
-      });
-    } else if (formState.message) {
+    if (state.message && state.message !== 'success') {
       toast({
         variant: 'destructive',
-        title: 'An error occurred.',
-        description: formState.message,
+        title: 'Error updating profile',
+        description: state.message,
+      });
+    } else if (state.message === 'success') {
+      toast({
+        title: 'Profile Updated',
+        description: 'Your changes have been saved.',
       });
     }
-  }, [formState, toast]);
-
+  }, [state, toast]);
 
   const handleDeleteAccount = async () => {
     if (!user || !userDocRef || !auth) return;
@@ -91,8 +92,16 @@ export default function SettingsPage() {
     deleteDocumentNonBlocking(userDocRef);
 
     try {
-      await auth.signOut();
+      const response = await fetch('/api/auth/session', {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete session');
+      }
 
+      await auth.signOut();
+      
       toast({
         title: 'Account Deletion Initiated',
         description: 'Your account data will be deleted. You have been signed out.',
@@ -121,12 +130,13 @@ export default function SettingsPage() {
 
   return (
     <div className="grid gap-6">
-      <form action={formAction} className="grid auto-rows-max gap-6 lg:col-span-2">
-        <Card>
+      <div className="grid auto-rows-max gap-6 lg:col-span-2">
+        <form action={formAction}>
+          <Card>
             <CardHeader>
               <CardTitle className="font-headline">Profile</CardTitle>
               <CardDescription>
-                Your personal information and preferences.
+                Update your personal information and preferences.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -134,11 +144,21 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="grid gap-2">
                     <Label htmlFor="name">Name</Label>
-                    <Input id="name" name="name" defaultValue={userProfile?.name || ''} />
+                    <Input
+                      id="name"
+                      name="name"
+                      defaultValue={userProfile?.name || ''}
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" value={user?.email || ''} disabled />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      defaultValue={user?.email || ''}
+                      disabled
+                    />
                   </div>
                 </div>
 
@@ -163,7 +183,10 @@ export default function SettingsPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="tone">Default Tone</Label>
-                     <Select name="preferredTone" defaultValue={userProfile?.preferredTone || 'casual'}>
+                    <Select
+                      name="preferredTone"
+                      defaultValue={userProfile?.preferredTone || 'casual'}
+                    >
                       <SelectTrigger id="tone">
                         <SelectValue placeholder="Select tone" />
                       </SelectTrigger>
@@ -182,8 +205,8 @@ export default function SettingsPage() {
             <CardFooter className="border-t px-6 py-4">
               <SubmitButton />
             </CardFooter>
-        </Card>
-      </form>
+          </Card>
+        </form>
 
         <Card>
           <CardHeader>
@@ -193,7 +216,7 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-             <AlertDialog>
+            <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">Delete Account</Button>
               </AlertDialogTrigger>
@@ -201,23 +224,31 @@ export default function SettingsPage() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your account data.
+                    This action cannot be undone. This will permanently delete your
+                    account data.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteAccount} disabled={isDeleting}>
-                    {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <AlertDialogAction
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Continue
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
             <p className="text-sm text-muted-foreground">
-                Permanently delete your account and all of your data. This action cannot be undone.
+              Permanently delete your account and all of your data. This action
+              cannot be undone.
             </p>
           </CardContent>
         </Card>
+      </div>
     </div>
   );
 }

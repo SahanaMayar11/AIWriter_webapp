@@ -42,16 +42,27 @@ export default function LoginPage() {
     }
 
     try {
-      await signInWithEmailAndPassword(
+      const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
+      
+      const idToken = await userCredential.user.getIdToken();
+
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
       toast({
         title: 'Login Successful',
         description: 'Redirecting you to the dashboard...',
       });
-      router.push('/');
+      router.push('/dashboard');
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred. Please try again.';
       if (error.code) {

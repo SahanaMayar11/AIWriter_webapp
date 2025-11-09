@@ -62,10 +62,6 @@
 @layer components {
   .btn-grad {
     background-image: linear-gradient(to right, #3A5F7E 0%, #2D9CDB 51%, #3A5F7E 100%);
-    margin: 10px;
-    padding: 15px 45px;
-    text-align: center;
-    text-transform: uppercase;
     transition: 0.5s;
     background-size: 200% auto;
     color: white;
@@ -77,13 +73,8 @@
     text-decoration: none;
   }
   .gradient-text {
-    background: -webkit-linear-gradient(left, #3A5F7E, #2D9CDB);
+    background: linear-gradient(to right, #3A5F7E, #2D9CDB);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-  }
-  .gradient-button {
-    background: linear-gradient(to right, #3A5F7E, #2D9CDB);
-    color: white;
-    border-radius: 9999px;
   }
 }

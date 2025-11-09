@@ -60,11 +60,21 @@ export default function SignupPage() {
         preferredTone: 'casual',
       });
 
+      const idToken = await user.getIdToken();
+
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
       toast({
         title: 'Signup Successful',
         description: 'Your account has been created.',
       });
-      router.push('/');
+      router.push('/dashboard');
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred. Please try again.';
       if (error.code) {
