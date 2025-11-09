@@ -99,7 +99,7 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
-            <Icons.logo className="size-10 text-primary" />
+            <Icons.logo className="size-10 gradient-text" />
           </div>
           <CardTitle className="text-2xl font-headline">
             Welcome Back!

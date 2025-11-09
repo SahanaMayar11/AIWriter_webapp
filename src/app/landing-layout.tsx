@@ -15,7 +15,7 @@ export default function LandingLayout({
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center bg-background fixed top-0 left-0 right-0 z-50 border-b">
         <Link href="/" className="flex items-center justify-center">
-          <Icons.logo className="h-6 w-6 text-primary" />
+          <Icons.logo className="h-6 w-6 gradient-text" />
           <span className="ml-2 text-lg font-semibold font-headline">WriteSphere</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
@@ -24,10 +24,10 @@ export default function LandingLayout({
             <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">About</Link>
             <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
           <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
+            <Link href="/login" className='btn-grad'>Login</Link>
           </Button>
           <Button asChild>
-            <Link href="/signup">Sign Up</Link>
+            <Link href="/signup" className='btn-grad'>Sign Up</Link>
           </Button>
         </nav>
       </header>
@@ -37,7 +37,7 @@ export default function LandingLayout({
           <div className="grid gap-8 md:grid-cols-4">
             <div className="space-y-4 md:col-span-2">
               <Link href="/" className="flex items-center">
-                <Icons.logo className="h-7 w-7 text-primary" />
+                <Icons.logo className="h-7 w-7 gradient-text" />
                 <span className="ml-2 text-xl font-bold font-headline">WriteSphere</span>
               </Link>
               <p className="max-w-xs text-muted-foreground text-sm">

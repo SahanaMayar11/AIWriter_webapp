@@ -91,7 +91,7 @@ export default function Home() {
           <div className="container px-4 md:px-6 text-center">
             <div className="max-w-3xl mx-auto space-y-6">
               <Badge variant="outline" className="py-1 px-3">
-                <WandSparkles className="h-4 w-4 mr-2 text-primary" />
+                <WandSparkles className="h-4 w-4 mr-2 gradient-text" />
                 Powered by Advanced AI
               </Badge>
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
@@ -134,7 +134,7 @@ export default function Home() {
               {features.map((feature, index) => (
                 <Card key={index}>
                   <CardHeader className="flex-row items-center gap-2">
-                    <feature.icon className="w-6 h-6 text-primary" />
+                    <feature.icon className="w-6 h-6 gradient-text" />
                     <CardTitle className="text-lg font-bold font-headline">
                       {feature.title}
                     </CardTitle>
@@ -202,7 +202,7 @@ export default function Home() {
                   {whyChooseUs.map((item) => (
                     <li key={item.title} className="flex items-start gap-4">
                       <div className="bg-primary/10 p-2 rounded-full">
-                        <item.icon className="h-5 w-5 text-primary" />
+                        <item.icon className="h-5 w-5 gradient-text" />
                       </div>
                       <div>
                         <h3 className="text-lg font-bold font-headline">
@@ -218,21 +218,21 @@ export default function Home() {
               </div>
               <Card className="p-8 space-y-6">
                 <div className="flex items-center gap-4">
-                  <Zap className="h-8 w-8 text-primary" />
+                  <Zap className="h-8 w-8 gradient-text" />
                   <div>
                     <p className="text-3xl font-bold font-headline">10x</p>
                     <p className="text-muted-foreground">Faster Writing</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <CheckSquare className="h-8 w-8 text-primary" />
+                  <CheckSquare className="h-8 w-8 gradient-text" />
                   <div>
                     <p className="text-3xl font-bold font-headline">95%</p>
                     <p className="text-muted-foreground">Grammar Accuracy</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Package className="h-8 w-8 text-primary" />
+                  <Package className="h-8 w-8 gradient-text" />
                   <div>
                     <p className="text-3xl font-bold font-headline">1000+</p>
                     <p className="text-muted-foreground">Essays Generated</p>
