@@ -341,7 +341,7 @@ export default function PlaygroundForm() {
                 <Textarea
                   value={content}
                   readOnly
-                  className="flex-1 w-full h--full text-base resize-none bg-card"
+                  className="flex-1 w-full h-full text-base resize-none bg-card"
                 />
               )}
             </div>
